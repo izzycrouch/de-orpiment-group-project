@@ -1,10 +1,7 @@
-import os
 from dotenv import load_dotenv
 import pg8000.native
 from src.utils.get_secret import get_secret
 import json
-
-load_dotenv(override=True)
 
 def connect_to_db():
     secrets = json.loads(get_secret())
