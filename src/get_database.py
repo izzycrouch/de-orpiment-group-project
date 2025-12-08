@@ -22,6 +22,7 @@ try:
         print('table_name:',table)
         print("Columns:", column_names)
         print('rows:',rows)
+
 except Exception as e:
     print(e)
 finally:
