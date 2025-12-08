@@ -1,0 +1,42 @@
+PROJECT_NAME = de-orpiment-group-project
+PYTHON_INTERPRETER = python
+WD=$(shell pwd)
+SHELL := /bin/bash
+PYTHONPATH=${WD}
+PIP:=pip
+
+# Build environment
+create-environment:
+	@echo ">>> About to create environment: $(PROJECT_NAME)..."
+	@echo ">>> check python3 version"
+	( \
+		$(PYTHON_INTERPRETER) --version; \
+	)
+	@echo ">>> Setting up venv."
+	( \
+	    $(PYTHON_INTERPRETER) -m venv venv; \
+	)
+
+ACTIVATE_ENV := source venv/bin/activate
+
+define execute_in_env
+	$(ACTIVATE_ENV) && $1
+endef
+
+# Build the environment requirements
+requirements: create-environment
+	$(call execute_in_env, $(PIP) install -r ./requirements.txt)
+
+# Set Up
+bandit:
+	$(call execute_in_env, $(PIP) install bandit)
+
+black:
+	$(call execute_in_env, $(PIP) install black)
+
+coverage:
+	$(call execute_in_env, $(PIP) install pytest-cov)
+dev-setup: bandit black coverage
+
+# Run all
+all: create-environment requirements dev-setup
