@@ -1,23 +1,23 @@
 import os
 from dotenv import load_dotenv
 import pg8000.native
-from src.utils import get_secret
-
+from src.utils.get_secret import get_secret
+import json
 
 load_dotenv(override=True)
 
-secrets = get_secret()
-
-
 def connect_to_db():
+    secrets = json.loads(get_secret())
+    print(secrets)
     return pg8000.native.Connection(
-        user=os.getenv(secrets['user']), 
-        password=os.getenv(secrets['password']),
-        database=os.getenv(secrets['database']),
-        host=os.getenv(secrets['host']),
-        port=int(os.getenv(secrets['port']))
+        user=secrets['user'],
+        password=secrets['password'],
+        database=secrets['database'],
+        host=secrets['host'],
+        port=int(secrets['port'])
     )
 
 
 def close_db_connection(conn):
     conn.close()
+
