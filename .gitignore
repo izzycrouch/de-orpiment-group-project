@@ -4,3 +4,5 @@ venv
 .terraform.lock.hcl
 .terraform*
 __pycache__
+**/.terraform*
+*.tfstate*
