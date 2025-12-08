@@ -25,11 +25,8 @@ In this project, we have created applications that will extract, transform, and 
 
 ## How to run
 1. Clone repo
-2. Set up your virtual environment and activate it
-3. Run export PYTHONPATH=$(pwd)
-4. Run pip install terraform pytest
-5. Check the requirments.txt for information on other packages and libraries required
-6. Run pytest and check all tests pass
-7. Go into the terraform folder in your terminal and run terraform init
-8. Run terraform plan
-9. Run terraform apply
+2. Run `make all` to create and activate virtual environment and download required packages and libraries
+3. Run pytest and check all tests pass
+4. Go into the terraform folder in your terminal and run `terraform init`
+5. Run `terraform plan`
+6. Run `terraform apply`
