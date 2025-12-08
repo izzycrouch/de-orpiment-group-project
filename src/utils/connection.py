@@ -8,7 +8,6 @@ load_dotenv(override=True)
 
 def connect_to_db():
     secrets = json.loads(get_secret())
-    print(secrets)
     return pg8000.native.Connection(
         user=secrets['user'],
         password=secrets['password'],
