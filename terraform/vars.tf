@@ -7,3 +7,8 @@ variable "dates_bucket_name" {
   type    = string
   default = "raw-data-dates-aci"
 }
+
+variable "python_runtime" {
+  type    = string
+  default = "python3.12"
+}
