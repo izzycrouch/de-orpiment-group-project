@@ -18,3 +18,10 @@ resource "aws_s3_bucket" "lambda_code_bucket" {
     Name = "lambda_code_bucket"
   }
 }
+
+resource "aws_s3_bucket" "clean_data_bucket" {
+  bucket = var.clean_data_bucket_name
+  tags = {
+    Name = "clean_data_bucket"
+  }
+}
