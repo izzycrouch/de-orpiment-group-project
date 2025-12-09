@@ -32,7 +32,7 @@ bandit:
 	$(call execute_in_env, $(PIP) install bandit)
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
-dev-setup: bandit black coverage
+dev-setup: bandit coverage
 
 # Run the security test
 security-test:
