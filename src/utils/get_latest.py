@@ -31,5 +31,3 @@ def get_latest(bucket_name,file_name = 'latest.json'):
 def save_latest(data,bucket_name,file_name = 'latest.json'):
     data = convert_dict(data)
     storage_data(data, bucket_name, file_name)
-
-
