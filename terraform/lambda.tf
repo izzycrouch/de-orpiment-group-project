@@ -6,4 +6,5 @@ resource "aws_lambda_function" "extract_raw_data_function" {
     s3_key = "extract.zip"
 
     handler = "extract.lambda_handler"
+    runtime = "python3.12"
 }
