@@ -11,7 +11,7 @@ try:
     """)
     print(tables)
 
-    for table in tables:
+    for table in tables[1:]:
         table = table[0]
         rows =  db.run(f"""
     SELECT *

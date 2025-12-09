@@ -20,5 +20,10 @@ variable "extract_lambda_func_name" {
 
 variable "clean_data_bucket_name" {
   type    = string
-  default = "clean-data-aci"
+  default = "raw-data-dates-aci"
+}
+
+variable "python_runtime" {
+  type    = string
+  default = "python3.12"
 }
