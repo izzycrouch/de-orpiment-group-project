@@ -17,3 +17,8 @@ variable "extract_lambda_func_name" {
   type    = string
   default = "extract-raw-data-lambda-func"
 }
+
+variable "clean_data_bucket_name" {
+  type    = string
+  default = "clean-data-aci"
+}
