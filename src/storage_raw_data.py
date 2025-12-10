@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from src.utils.connection import connect_to_db,close_db_connection
 from src.utils.storage_data import storage_data
-from src.utils.get_latest import get_latest,save_latest
+from src.utils.get_latest import get_latest, save_latest
 import os
 import io
 
