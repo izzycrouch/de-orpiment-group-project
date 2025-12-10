@@ -1,5 +1,6 @@
 import boto3
 from botocore.exceptions import ClientError
+import json
 
 def get_secret():
     secret_name = "project-orpiment-raw-database"
@@ -19,4 +20,5 @@ def get_secret():
         raise e
 
     secret = get_secret_value_response['SecretString']
+    secret = json.loads(secret)
     return secret
