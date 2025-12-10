@@ -2,8 +2,8 @@ name: de-orpiment-group-project
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
+      - '**'
 
 jobs:
   run-tests:
