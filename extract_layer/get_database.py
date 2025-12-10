@@ -1,4 +1,4 @@
-from src.utils.connection import connect_to_db,close_db_connection
+from extract_layer.utils.connection import connect_to_db, close_db_connection
 
 
 db = None

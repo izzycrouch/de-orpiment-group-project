@@ -1,12 +1,11 @@
-from src.utils.connection import connect_to_db, close_db_connection
+from extract_layer.utils.connection import connect_to_db, close_db_connection
 from unittest.mock import MagicMock, patch
 
 class TestDBConnection:
 
-    @patch('src.utils.connection.get_database_credentials')
-    @patch('src.utils.connection.pg8000.native.Connection')
-    def test_get_connection(self, mock_connect, mock_get_secrets):
-
+    @patch('extract_layer.utils.connection.get_db_credentials')
+    @patch('extract_layer.utils.connection.pg8000.native.Connection')
+    def test_db_connection(self, mock_connect, mock_get_secrets):
         mock_get_secrets.return_value = {
             'user': 'test_user',
             'password': 'test_password',
@@ -33,8 +32,8 @@ class TestDBConnection:
         mock_connect.assert_called_once()
         assert conn == mock_conn
     
+
     def test_close_connection(self):
-        
         mock_conn = MagicMock()
         close_db_connection(mock_conn)
 
