@@ -53,7 +53,7 @@ def lambda_handler(event,content):
         save_latest(new_json,BUCKET_NAME)
 
     except Exception as e:
-        logger.error("storage_raw_data_error: ", e)
+        return str(e)
     finally:
         if db:
             close_db_connection(db)
@@ -68,6 +68,3 @@ def build_inital_json(tables):
     for table in tables:
         res[table] = very_old_time
     return res
-
-
-
