@@ -4,7 +4,7 @@ from src.utils.get_secret import get_secret
 import json
 
 def connect_to_db():
-    secrets = json.loads(get_secret())
+    secrets = get_secret()
     return pg8000.native.Connection(
         user=secrets['user'],
         password=secrets['password'],
