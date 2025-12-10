@@ -1,4 +1,5 @@
 import pytest
+from pytest import MonkeyPatch
 import json
 import boto3
 from moto import mock_aws
@@ -6,10 +7,15 @@ from botocore.exceptions import ClientError
 from src.utils.get_secret import get_secret
 
 
-class TestGetSecretWithMoto:
+class TestGetSecret:
 
     @pytest.fixture
-    def aws_credentials(self, monkeypatch):
+    def mock_secrets_manager(self):
+        with mock_aws():
+            yield boto3.client('secretsmanager', region_name='eu-west-2')
+    
+    @pytest.fixture
+    def aws_credentials(self, monkeypatch: MonkeyPatch):
 
         monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'testing')
         monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'testing')
@@ -18,23 +24,18 @@ class TestGetSecretWithMoto:
         monkeypatch.setenv('AWS_DEFAULT_REGION', 'eu-west-2')
 
     @pytest.fixture
-    def secrets_manager_client(self):
-        with mock_aws():
-            yield boto3.client('secretsmanager', region_name='eu-west-2')
-
-    @pytest.fixture
-    def sample_secret(self, secrets_manager_client):
+    def sample_secret(self, mock_secrets_manager):
 
         secret_name = 'test-database-credentials'
         secret_value = {
-            "database": "test",
+            "database": "test_db",
             "host": "test-db.example.com",
             "port": 5432,
-            "username": "testu",
-            "password": "test"
+            "username": "test_user",
+            "password": "test_pass"
         }
 
-        secrets_manager_client.create_secret(
+        mock_secrets_manager.create_secret(
             Name=secret_name,
             SecretString=json.dumps(secret_value)
         )
@@ -44,7 +45,7 @@ class TestGetSecretWithMoto:
     @mock_aws
     def test_get_secret_returns_dictionary(self, aws_credentials, sample_secret):
 
-        secret_name, expected_output = sample_secret
+        secret_name, _ = sample_secret
 
         result = get_secret(secret_name, region_name='eu-west-2')
 
@@ -74,8 +75,15 @@ class TestGetSecretWithMoto:
         assert result['username'] == expected_output['username']
         assert result['password'] == expected_output['password']
 
-    def test_get_sectret_raises_error(self, aws_credentials, sample_secret):
-        secret_name, expected_output = sample_secret
+
+    def test_get_sectret_raises_error_with_incorrect_region_name(self, aws_credentials, sample_secret):
+        secret_name, _ = sample_secret
 
         with pytest.raises(ClientError):
             get_secret(secret_name, region_name='eu-west-1')
+
+
+    def test_get_sectret_raises_error_with_incorrect_secret_name(self, aws_credentials):
+
+        with pytest.raises(ClientError):
+            get_secret(secret_name = 'test_secret', region_name='eu-west-2')
