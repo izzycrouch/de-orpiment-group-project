@@ -6,7 +6,7 @@ from src.utils.connection import connect_to_db,close_db_connection
 from src.utils.storage_data import storage_data
 from src.utils.get_latest import get_latest,save_latest
 import os
-
+import io
 def lambda_handler(event,content):
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
@@ -23,33 +23,36 @@ def lambda_handler(event,content):
 
     try:
         db = connect_to_db()
-        tables = db.run("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+        tables = ['counterparty', 'address', 'department', 'purchase_order', 'staff', 'payment_type', 'payment', 'transaction', 'design', 'sales_order', 'currency']
         old_json = get_latest(BUCKET_NAME)
         if not old_json:
             old_json = build_inital_json(tables)
         new_json = {}
         for table in tables:
-            table = table[1:]
             file_name = table +  prefix + 'batch_' + timestamp +'.parquet'
             latest_timestamp = old_json[table]
             rows =  db.run(f"""
                         SELECT * FROM {table}
-                        WHERE last_update > :last_update;
+                        WHERE last_updated > :last_updated;
                         """,
-                        {'last_update': latest_timestamp }
+                        last_updated = latest_timestamp
                         )
             if rows:
                 column_names = [col["name"] for col in db.columns]
                 df = pd.DataFrame(rows,columns=column_names)
-                data = df.to_parquet
-                storage_data(data, BUCKET_NAME, file_name)
+
+                buffer = io.StringIO()
+                df.to_csv(buffer, index=False)
+                buffer.seek(0)
+
+                storage_data(buffer.getvalue().encode("utf-8"), BUCKET_NAME, file_name.replace(".parquet", ".csv"))
                 latest_timestamp = df['last_updated'].max()
 
             new_json[table] = latest_timestamp
         save_latest(new_json,BUCKET_NAME)
 
     except Exception as e:
-        logger.error("storage_raw_data_error: ", e)
+        return str(e)
     finally:
         if db:
             close_db_connection(db)
@@ -59,12 +62,7 @@ def lambda_handler(event,content):
 
 def build_inital_json(tables):
     very_old_time = datetime.min
-    dict = {}
+    res = {}
     for table in tables:
-        table = table[1:]
-    dict[table] = very_old_time
-    return dict
-
-
-
-
+        res[table] = very_old_time
+    return res
