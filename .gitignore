@@ -3,6 +3,6 @@ venv
 .terraform
 .terraform.lock.hcl
 .terraform*
-__pycache__
+**__pycache__*
 **/.terraform*
 *.tfstate*
