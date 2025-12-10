@@ -2,10 +2,8 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 
-def get_secret():
-    secret_name = "project-orpiment-raw-database"
-    region_name = "eu-west-2"
-
+def get_secret(secret_name = "project-orpiment-raw-database", region_name = "eu-west-2"):
+    
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
@@ -20,5 +18,5 @@ def get_secret():
         raise e
 
     secret = get_secret_value_response['SecretString']
-    secret = json.loads(secret)
-    return secret
+    dict_secret = json.loads(secret)
+    return dict_secret
