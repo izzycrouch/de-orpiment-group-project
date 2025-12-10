@@ -4,7 +4,7 @@ import json
 import boto3
 from moto import mock_aws
 from botocore.exceptions import ClientError
-from src.utils.get_secret import get_secret
+from src.utils.get_database_credentials import get_database_credentials
 
 
 class TestGetSecret:
@@ -47,7 +47,7 @@ class TestGetSecret:
 
         secret_name, _ = sample_secret
 
-        result = get_secret(secret_name, region_name='eu-west-2')
+        result = get_database_credentials(secret_name, region_name='eu-west-2')
 
         assert isinstance(result, dict)
 
@@ -57,7 +57,7 @@ class TestGetSecret:
         secret_name, expected_output = sample_secret
         expected_keys = list(expected_output.keys())
 
-        result = get_secret(secret_name, region_name='eu-west-2')
+        result = get_database_credentials(secret_name, region_name='eu-west-2')
         list_keys = list(result.keys())
 
         assert list_keys == expected_keys
@@ -67,7 +67,7 @@ class TestGetSecret:
 
         secret_name, expected_output = sample_secret
 
-        result = get_secret(secret_name, region_name='eu-west-2')
+        result = get_database_credentials(secret_name, region_name='eu-west-2')
 
         assert result['database'] == expected_output['database']
         assert result['host'] == expected_output['host']
@@ -80,10 +80,10 @@ class TestGetSecret:
         secret_name, _ = sample_secret
 
         with pytest.raises(ClientError):
-            get_secret(secret_name, region_name='eu-west-1')
+            get_database_credentials(secret_name, region_name='eu-west-1')
 
 
     def test_get_sectret_raises_error_with_incorrect_secret_name(self, aws_credentials):
 
         with pytest.raises(ClientError):
-            get_secret(secret_name = 'test_secret', region_name='eu-west-2')
+            get_database_credentials(secret_name = 'test_secret', region_name='eu-west-2')

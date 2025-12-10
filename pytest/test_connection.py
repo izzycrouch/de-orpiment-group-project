@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 class TestDBConnection:
 
-    @patch('src.utils.connection.get_secret')
+    @patch('src.utils.connection.get_database_credentials')
     @patch('src.utils.connection.pg8000.native.Connection')
     def test_get_connection(self, mock_connect, mock_get_secrets):
 
