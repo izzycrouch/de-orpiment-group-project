@@ -2,13 +2,13 @@
 import logging
 import pandas as pd
 from datetime import datetime, timezone
-from src.utils.connection import connect_to_db,close_db_connection
-from src.utils.storage_data import storage_data
-from src.utils.get_latest import get_latest, save_latest
+from extract_layer.utils.connection import connect_to_db, close_db_connection
+from extract_layer.utils.save_data import save_data
+from extract_layer.utils.extraction_info import get_latest_extraction_info, save_new_extraction_info
 import os
 import io
 
-def lambda_handler(event,content):
+def lambda_handler(event, content):
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
@@ -25,7 +25,7 @@ def lambda_handler(event,content):
     try:
         db = connect_to_db()
         tables = ['counterparty', 'address', 'department', 'purchase_order', 'staff', 'payment_type', 'payment', 'transaction', 'design', 'sales_order', 'currency']
-        old_json = get_latest(BUCKET_NAME)
+        old_json = get_latest_extraction_info(BUCKET_NAME)
         if not old_json:
             old_json = build_inital_json(tables)
         new_json = {}
@@ -46,11 +46,11 @@ def lambda_handler(event,content):
                 df.to_csv(buffer, index=False)
                 buffer.seek(0)
 
-                storage_data(buffer.getvalue().encode("utf-8"), BUCKET_NAME, file_name.replace(".parquet", ".csv"))
+                save_data(buffer.getvalue().encode("utf-8"), BUCKET_NAME, file_name.replace(".parquet", ".csv"))
                 latest_timestamp = df['last_updated'].max()
 
             new_json[table] = latest_timestamp
-        save_latest(new_json,BUCKET_NAME)
+        save_new_extraction_info(new_json,BUCKET_NAME)
 
     except Exception as e:
         return str(e)

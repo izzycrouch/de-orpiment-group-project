@@ -1,4 +1,4 @@
-from src.utils.storage_data import read_data,storage_data
+from extract_layer.utils.save_data import save_data, read_data
 import json
 from datetime import datetime
 
@@ -43,4 +43,4 @@ def save_new_extraction_info(input_dict: dict, bucket_name: str, file_name: str 
     
     encoded_dict = convert_dict_to_bytes(input_dict)
     
-    storage_data(data=encoded_dict, bucket=bucket_name, file_name=file_name)
+    save_data(data=encoded_dict, bucket=bucket_name, file_name=file_name)

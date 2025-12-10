@@ -1,6 +1,5 @@
 import pytest
-from pytest import MonkeyPatch
-from src.utils.get_latest_extraction_info import convert_extraction_info_to_dict, convert_dict_to_bytes, get_latest_extraction_info
+from extract_layer.utils.extraction_info import convert_extraction_info_to_dict, convert_dict_to_bytes, get_latest_extraction_info
 from datetime import datetime
 from moto import mock_aws
 import boto3
@@ -15,6 +14,7 @@ class TestConvertExtractionInfoToDict:
 
         assert isinstance(result, dict)
     
+    
     def test_convert_extraction_info_to_dict_returns_correct_key(self):
         test_data = "{\"test_table_name\" : \"2025-12-10T11:28:35.000372\"}"
         result = convert_extraction_info_to_dict(test_data)
@@ -22,6 +22,7 @@ class TestConvertExtractionInfoToDict:
         keys_list = list(result.keys())
 
         assert keys_list == ['test_table_name']
+
 
     def test_convert_extraction_info_to_dict_returns_value_isinstance_datetime(self):
         test_data = "{\"test_table_name\" : \"2025-12-10T11:28:35.000372\"}"
@@ -54,14 +55,6 @@ class TestConvertDictToBytes:
 
 
 @pytest.fixture
-def aws_credentials(monkeypatch: MonkeyPatch):
-    monkeypatch.setenv('AWS_ACCESS_KEY_ID', 'testing')
-    monkeypatch.setenv('AWS_SECRET_ACCESS_KEY', 'testing')
-    monkeypatch.setenv('AWS_SECURITY_TOKEN', 'testing')
-    monkeypatch.setenv('AWS_SESSION_TOKEN', 'testing')
-    monkeypatch.setenv('AWS_DEFAULT_REGION', 'eu-west-2')
-
-@pytest.fixture
 def mock_s3_bucket():
     with mock_aws():
         yield boto3.client('s3', region_name='eu-west-2')
@@ -70,7 +63,7 @@ def mock_s3_bucket():
 class TestGetLatestExtractionInfo:  
     
     @mock_aws
-    def test_get_latest_returns_isinstance_dictionary(self, aws_credentials, mock_s3_bucket):
+    def test_get_latest_returns_isinstance_dictionary(self, mock_s3_bucket):
         test_bucket = 'test_bucket'
         test_key = 'test-key.json'
         
@@ -85,7 +78,7 @@ class TestGetLatestExtractionInfo:
         assert isinstance(result, dict)
     
 
-    def test_get_latest_returns_correct_dictionary_key(self, aws_credentials, mock_s3_bucket):
+    def test_get_latest_returns_correct_dictionary_key(self, mock_s3_bucket):
         test_bucket = 'test_bucket'
         test_key = 'test-key.json'
         
@@ -101,7 +94,7 @@ class TestGetLatestExtractionInfo:
         assert list_keys == ['test_key']
 
 
-    def test_get_latest_returns_correct_dictionary_value(self, aws_credentials, mock_s3_bucket):
+    def test_get_latest_returns_correct_dictionary_value(self, mock_s3_bucket):
         test_bucket = 'test_bucket'
         test_key = 'test-key.json'
         

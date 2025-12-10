@@ -1,10 +1,9 @@
-from dotenv import load_dotenv
 import pg8000.native
-from src.utils.get_database_credentials import get_database_credentials
-import json
+from extract_layer.utils.db_credentials import get_db_credentials
+
 
 def connect_to_db():
-    secrets = get_database_credentials()
+    secrets = get_db_credentials()
     return pg8000.native.Connection(
         user=secrets['user'],
         password=secrets['password'],
