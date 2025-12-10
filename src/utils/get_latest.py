@@ -2,6 +2,7 @@ from src.utils.storage_data import read_data,storage_data
 import json
 from datetime import datetime
 
+# json_str format: {'table_name': 'timestamp_of_extraction'}
 def get_datetime_dict(input_json_str: str):
     
     output_dict = json.loads(input_json_str)
@@ -9,20 +10,22 @@ def get_datetime_dict(input_json_str: str):
     for key, value in output_dict.items():
         try:
             output_dict[key] = datetime.fromisoformat(value)
-        except Exception as e:
-            raise e('Value is not a valid datetime.')
+        except:
+            raise ValueError('Value cannot be converted to datetime datatype.')
     
     return output_dict
 
-
+# input_dict format: {'table_name': datetime}
 def convert_to_enconded_json(input_dict: dict):
     for key,value in input_dict.items():
-        input_dict[key] = value.isoformat()
+        try:
+            input_dict[key] = value.isoformat()
+        except:
+            raise TypeError('Value is not a datetime datatype.')
     
-    json_content = json.dumps(input_dict)
-    encoded_json = json_content.encode('utf-8')
+    bytes_output = json.dumps(input_dict).encode('utf-8')
     
-    return encoded_json
+    return bytes_output
 
 
 def get_latest(bucket_name, file_name = 'latest.json'):
