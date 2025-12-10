@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import ClientError
 import json
 
-def get_secret(secret_name = "project-orpiment-raw-database", region_name = "eu-west-2"):
+def get_database_credentials(secret_name = "project-orpiment-raw-database", region_name = "eu-west-2"):
     
     session = boto3.session.Session()
     client = session.client(

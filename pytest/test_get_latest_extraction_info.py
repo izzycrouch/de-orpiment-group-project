@@ -1,6 +1,6 @@
 import pytest
 from pytest import MonkeyPatch
-from src.utils.get_latest import convert_extraction_info_to_dict, convert_dict_to_bytes, get_latest_extraction_info
+from src.utils.get_latest_extraction_info import convert_extraction_info_to_dict, convert_dict_to_bytes, get_latest_extraction_info
 from datetime import datetime
 from moto import mock_aws
 import boto3
