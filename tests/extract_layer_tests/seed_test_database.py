@@ -1,26 +1,15 @@
-from extract_layer.utils.connection import connect_to_db, close_db_connection
-import os
+from extract_layer.utils.connection import connect_to_db, close_db_connection,connect_to_local_db
 from dotenv import load_dotenv
-import pg8000.native
+
 
 #set connection function for local postgre
-load_dotenv(override=True)
 
-def connect_to_local_db():
-    return pg8000.native.Connection(
-        user=os.getenv("PG_USER"),
-        password=os.getenv("PG_PASSWORD"),
-        database=os.getenv("PG_DATABASE"),
-        host=os.getenv("PG_HOST"),
-        port=int(os.getenv("PG_PORT"))
-    )
 
-def close_local_db_connection(conn):
-    conn.close()
+
 
 
 def return_creat_table_sql(table_name, schema_rows):
-    res = f'CREATE TABLE IF NOT EXISTS {table_name} ('
+    res = f'CREATE TABLE {table_name} ('
     col_list = []
     for col_name, data_type, char_len in schema_rows:
 
@@ -59,7 +48,7 @@ try:
 
     for table in tables:
 
-
+        local_db.run(f'DROP TABLE IF EXISTS {table};')
 
         schema_rows = db.run(f"""
                                 SELECT
@@ -105,4 +94,15 @@ finally:
     if db:
         close_db_connection(db)
     print("Seeding Complete.")
-    close_local_db_connection(local_db)
+    close_db_connection(local_db)
+
+
+
+# local_db = connect_to_local_db()
+# res = local_db.run(f"""
+#             SELECT *
+#             FROM  department
+#             LIMIT 1;
+#         """)
+# print("aaaa:",res)
+# close_db_connection(local_db)
