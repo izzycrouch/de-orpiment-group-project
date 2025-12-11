@@ -70,6 +70,6 @@ class TestGetDBCredentials:
             get_db_credentials(secret_name, region_name='eu-west-1')
 
 
-    def test_get_db_credentials_raises_error_with_incorrect_secret_name(self):
+    def test_get_db_credentials_raises_error_with_incorrect_secret_name(self, sample_secret):
         with pytest.raises(ClientError):
             get_db_credentials(secret_name = 'test_secret', region_name='eu-west-2')

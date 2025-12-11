@@ -50,7 +50,7 @@ class TestSaveData:
         assert isinstance(saved_data, bytes)
 
 
-    def test_save_data_raises_error_when_bucket_doesnt_exist(self):
+    def test_save_data_raises_error_when_bucket_doesnt_exist(self, mock_s3_bucket):
         bucket_name = "non-existent"
         file_name = "example.json"
         data = b"hello world"
@@ -92,7 +92,7 @@ class TestReadData:
         assert isinstance(result, dict)
 
 
-    def test_read_data_raises_error_when_bucket_doesnt_exist(self):
+    def test_read_data_raises_error_when_bucket_doesnt_exist(self, mock_s3_bucket):
         bucket_name = "test-bucket"
         file_name = "example.json"
 
