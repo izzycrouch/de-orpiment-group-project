@@ -1,4 +1,4 @@
-from src.zip_layer_files import create_zip_layer, upload_zip_to_s3
+from extract_layer.utils.zip_layer_files import create_zip_layer, upload_zip_to_s3
 import zipfile
 import boto3
 from moto import mock_aws
