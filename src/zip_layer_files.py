@@ -23,6 +23,7 @@ def create_zip_layer(folder_name: str):
 
     return in_memory
 
+
 def upload_zip_to_s3(in_memory: io.BytesIO, bucket: str, key: str):
 
     try:
