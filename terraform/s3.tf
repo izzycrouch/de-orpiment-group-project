@@ -30,7 +30,7 @@ resource "aws_s3_object" "connection_object" {
   key      = "extract_layer/utils/connection.py"
   source   = "./extract_layer/utils/connection.py"
 
-  etag     = filemd5("./extract_layer/utils/connection.py")
+  etag     = filemd5("../extract_layer/utils/connection.py")
 }
 
 resource "aws_s3_object" "db_credentials_object" {
@@ -38,7 +38,7 @@ resource "aws_s3_object" "db_credentials_object" {
   key      = "extract_layer/utils/db_credentals.py"
   source   = "./extract_layer/utils/db_credentals.py"
 
-  etag     = filemd5("./extract_layer/utils/db_credentals.py")
+  etag     = filemd5("../extract_layer/utils/db_credentials.py")
 }
 
 resource "aws_s3_object" "extraction_info_object" {
@@ -46,7 +46,7 @@ resource "aws_s3_object" "extraction_info_object" {
   key      = "extract_layer/utils/extraction_info.py"
   source   = "./extract_layer/utils/extraction_info.py"
 
-  etag     = filemd5("./extract_layer/utils/extraction_info.py")
+  etag     = filemd5("../extract_layer/utils/extraction_info.py")
 }
 
 resource "aws_s3_object" "save_data_object" {
@@ -54,7 +54,7 @@ resource "aws_s3_object" "save_data_object" {
   key      = "extract_layer/utils/save_data.py"
   source   = "./extract_layer/utils/save_data.py"
 
-  etag     = filemd5("./extract_layer/utils/save_data.py")
+  etag     = filemd5("../extract_layer/utils/save_data.py")
 }
 
 resource "aws_s3_object" "get_database_object" {
@@ -62,7 +62,7 @@ resource "aws_s3_object" "get_database_object" {
   key      = "extract_layer/get_database.py"
   source   = "./extract_layer/get_database.py"
 
-  etag     = filemd5("./extract_layer/get_database.py")
+  etag     = filemd5("../extract_layer/get_database.py")
 }
 
 resource "aws_s3_object" "extract_lambda_object" {
@@ -70,5 +70,5 @@ resource "aws_s3_object" "extract_lambda_object" {
   key      = "extract_layer/extract_lambda.py"
   source   = "./extract_layer/extract_lambda.py"
 
-  etag     = filemd5("./extract_layer/extract_lambda.py")
+  etag     = filemd5("../extract_layer/extract_lambda.py")
 }
