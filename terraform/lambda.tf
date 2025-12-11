@@ -20,33 +20,18 @@ resource "aws_lambda_function" "extract_raw_data_function" {
 
   timeout = 200
 }
-  function_name   = "extract-func"
-  role            = aws_iam_role.s3_role.arn
-  
-  s3_bucket   = "${var.lambda_code_bucket_name}"
-  s3_key      = "extract.zip"
-
-  handler     = "extract_lambda.lambda_handler"
-  runtime     = var.python_runtime
-
-  layers      = [
-    aws_lambda_layer_version.get_database_layer.arn,
-    aws_lambda_layer_version.libraries_layer.arn,
-    aws_lambda_layer_version.utils_layer.arn
-    ]
-}
 
 resource "aws_lambda_function" "zip_lambda_function" {
-  function_name   = "zip-lambda-func"
-  role            = aws_iam_role.s3_role.arn
-  
-  s3_bucket   = "${var.lambda_code_bucket_name}"
-  s3_key      = "zip_lambda.zip"
+  function_name = "zip-lambda-func"
+  role          = aws_iam_role.s3_role.arn
 
-  handler     = "zip_lambda_func.lambda_handler"
-  runtime     = var.python_runtime
+  s3_bucket = var.lambda_code_bucket_name
+  s3_key    = "zip_lambda.zip"
 
-  layers      = [aws_lambda_layer_version.libraries_layer.arn]
+  handler = "zip_lambda_func.lambda_handler"
+  runtime = var.python_runtime
+
+  layers = [aws_lambda_layer_version.libraries_layer.arn]
 }
 
 resource "aws_lambda_layer_version" "libraries_layer" {
