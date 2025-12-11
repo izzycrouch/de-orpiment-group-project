@@ -49,14 +49,14 @@ def lambda_handler(event, content):
                 column_names = [col["name"] for col in db.columns]
                 df = pd.DataFrame(rows,columns=column_names)
                 buffer = io.BytesIO()
-
-                # df.to_parquet(buffer, index=False)
-                # buffer.seek(0)
-                # save_data(buffer.getvalue(), BUCKET_NAME, file_name)
-
-                df.to_csv(buffer, index=False)
+                #for parquet require pyarrow:
+                df.to_parquet(buffer, index=False)
                 buffer.seek(0)
-                save_data(buffer.getvalue(), BUCKET_NAME, file_name.replace(".parquet", ".csv"))
+                save_data(buffer.getvalue(), BUCKET_NAME, file_name)
+                #for csv:
+                # df.to_csv(buffer, index=False)
+                # buffer.seek(0)
+                # save_data(buffer.getvalue(), BUCKET_NAME, file_name.replace(".parquet", ".csv"))
 
                 latest_timestamp = df['last_updated'].max()
 

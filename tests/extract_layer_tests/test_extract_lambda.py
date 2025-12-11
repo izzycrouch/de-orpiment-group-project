@@ -2,12 +2,12 @@ from dotenv import load_dotenv
 import os
 import boto3
 import pandas as pd
-from io import StringIO
+from io import StringIO,BytesIO
 from moto import mock_aws
 from botocore.exceptions import ClientError
 from extract_layer.utils.extraction_info import convert_extraction_info_to_dict
 from extract_layer.extract_lambda import lambda_handler
-
+import pyarrow.parquet as pq
 
 
 @mock_aws
@@ -50,7 +50,11 @@ def test_save_date_saves_tables_into_s3_bucket():
     key = response['Contents'][0]['Key']
     print(key)
     response = mock_s3_bucket.get_object(Bucket=bucket_name, Key=key)
-    csv_string = response['Body'].read().decode('utf-8')
+    #for csv:
+    # csv_string = response['Body'].read().decode('utf-8')
+    # df = pd.read_csv(StringIO(csv_string))
 
-    df = pd.read_csv(StringIO(csv_string))
+    parquet_bytes = response['Body'].read()
+
+    df = pq.read_table(BytesIO(parquet_bytes)).to_pandas()
     assert isinstance(df, pd.DataFrame)
