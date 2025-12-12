@@ -2,9 +2,9 @@ import boto3
 import zipfile
 import io
 
-#event = {'bucket': 'bucket_name'}
+#something changed
 
-def lambda_handler(event: dict):
+def lambda_handler(event, content):
     s3_client = boto3.client('s3')
 
     bucket = "lambda-func-code-aci"
