@@ -13,7 +13,10 @@ def lambda_handler(event: dict):
 
     try:
         contents = response['Contents']
-        loose_objects = [obj for obj in contents if '/' not in obj["Key"]]
+
+        non_zip_contents = [obj for obj in contents if not obj['Key'].endswith('.zip')]
+
+        loose_objects = [obj for obj in non_zip_contents if '/' not in obj["Key"]]
 
         for obj in loose_objects:
 
@@ -35,7 +38,7 @@ def lambda_handler(event: dict):
 
         folders = {}
 
-        for obj in contents:
+        for obj in non_zip_contents:
             key = obj['Key']
             if '/' in key:
                 split_keys = key.split('/')
