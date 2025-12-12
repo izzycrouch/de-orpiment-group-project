@@ -6,8 +6,8 @@ import io
 
 def lambda_handler(event: dict):
     s3_client = boto3.client('s3')
-    
-    bucket = event['bucket']
+
+    bucket = "lambda-func-code-aci"
 
     response = s3_client.list_objects_v2(Bucket=bucket)
 
@@ -18,14 +18,14 @@ def lambda_handler(event: dict):
         for obj in loose_objects:
 
             key = obj['Key']
-           
+
             response = s3_client.get_object(Bucket=bucket, Key=key)
             content = response['Body'].read()
 
             zip_file_name = obj['Key'].replace('.py', '.zip')
-            
+
             zip_buffer = io.BytesIO()
-            
+
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 zipf.writestr(key, content)
 
@@ -34,19 +34,19 @@ def lambda_handler(event: dict):
 
 
         folders = {}
-        
+
         for obj in contents:
             key = obj['Key']
             if '/' in key:
                 split_keys = key.split('/')
                 folder = split_keys[0]
-                
+
                 if folder not in folders:
                     folders[folder] = []
-                
+
                 folders[folder].append(key)
 
-        
+
         for folder, keys in folders.items():
             zip_buffer = io.BytesIO()
 

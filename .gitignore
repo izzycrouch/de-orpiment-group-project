@@ -6,3 +6,4 @@ venv
 **__pycache__*
 **/.terraform*
 *.tfstate*__pycache__/
+**.zip
