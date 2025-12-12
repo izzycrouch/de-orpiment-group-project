@@ -7,3 +7,4 @@ venv
 **/.terraform*
 *.tfstate*__pycache__/
 **.zip
+**python
