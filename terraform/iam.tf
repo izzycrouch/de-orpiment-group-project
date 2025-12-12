@@ -21,7 +21,7 @@ resource "aws_iam_role" "s3_role" {
 data "aws_iam_policy_document" "s3_write" {
   statement {
     actions = [
-      "s3:PutObject"
+      "s3:*"
     ]
     resources = [
       "*"
@@ -42,4 +42,6 @@ resource "aws_iam_role_policy_attachment" "attach_read" {
   role       = aws_iam_role.s3_role.name
   policy_arn = aws_iam_policy.s3_write_policy.arn
 }
+
+
 
