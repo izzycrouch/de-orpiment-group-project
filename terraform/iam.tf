@@ -30,6 +30,25 @@ data "aws_iam_policy_document" "s3_write" {
 }
 
 
+data "aws_iam_policy_document" "secrets_read" {
+  statement {
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "secrets_read_policy" {
+  name   = "read_db_secret"
+  policy = data.aws_iam_policy_document.secrets_read.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_secrets" {
+  role       = aws_iam_role.s3_role.name
+  policy_arn = aws_iam_policy.secrets_read_policy.arn
+}
+
+
+
 #create policy
 resource "aws_iam_policy" "s3_write_policy" {
   name   = "write_s3_bucket"
