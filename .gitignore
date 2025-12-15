@@ -8,3 +8,4 @@ venv
 *.tfstate*__pycache__/
 **.zip
 **python
+zip_lambda_func
