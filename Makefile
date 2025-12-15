@@ -29,7 +29,7 @@ requirements: create-environment
 
 # Set Up
 bandit:
-	$(call execute_in_env$(call execute_in_env, $(PIP) install bandit))
+	$(call execute_in_env, $(PIP) install bandit)
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
 dev-setup: bandit coverage
