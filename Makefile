@@ -29,7 +29,7 @@ requirements: create-environment
 
 # Set Up
 bandit:
-	$(call execute_in_env, $(PIP) install bandit)
+	$(call execute_in_env$(call execute_in_env, $(PIP) install bandit)
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
 dev-setup: bandit coverage
@@ -41,3 +41,8 @@ security-test:
 
 # Run all
 all: create-environment requirements dev-setup security-test
+
+# Run bash script
+run-script:
+	chmod +x upload_zip.sh
+	./upload_zip.sh
