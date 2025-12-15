@@ -20,7 +20,7 @@ create-environment:
 ACTIVATE_ENV := source venv/bin/activate
 
 define execute_in_env
-	$(ACTIVATE_ENV) && $1
+	$(ACTIVATE_ENV) && $(1)
 endef
 
 # Build environment requirements
@@ -29,14 +29,14 @@ requirements: create-environment
 
 # Set Up
 bandit:
-	$(call execute_in_env$(call execute_in_env, $(PIP) install bandit))
+	$(call execute_in_env, $(PIP) install bandit)
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
 dev-setup: bandit coverage
 
 # Run security test
 security-test:
-	$(call execute_in_env, bandit -lll -r src)
+	$(call execute_in_env, bandit -lll -r ./clean_layer ./extract_layer)
 
 # Run all
 all: create-environment requirements dev-setup security-test
