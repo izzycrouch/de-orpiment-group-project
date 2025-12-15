@@ -31,7 +31,7 @@ class TestDBConnection:
 
         mock_connect.assert_called_once()
         assert conn == mock_conn
-    
+
 
     def test_close_connection(self):
         mock_conn = MagicMock()
