@@ -23,21 +23,25 @@ define execute_in_env
 	$(ACTIVATE_ENV) && $1
 endef
 
-# Build the environment requirements
+# Build environment requirements
 requirements: create-environment
 	$(call execute_in_env, $(PIP) install -r ./requirements.txt)
 
 # Set Up
 bandit:
-	$(call execute_in_env, $(PIP) install bandit)
+	$(call execute_in_env$(call execute_in_env, $(PIP) install bandit))
 coverage:
 	$(call execute_in_env, $(PIP) install pytest-cov)
 dev-setup: bandit coverage
 
-# Run the security test
+# Run security test
 security-test:
 	$(call execute_in_env, bandit -lll -r src)
 
-
 # Run all
 all: create-environment requirements dev-setup security-test
+
+# Run bash script
+run-script:
+	chmod +x upload_layer_func.sh
+	./upload_layer_func.sh
