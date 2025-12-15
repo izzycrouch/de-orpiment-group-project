@@ -57,4 +57,3 @@ def test_library_bucket_not_found():
     with pytest.raises(ClientError):
         upload_zip_to_s3(in_memory, bucket_name, key)
 
-    
