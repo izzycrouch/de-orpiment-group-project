@@ -27,6 +27,9 @@ In this project, we have created applications that will extract, transform, and 
 1. Clone repo
 2. Run `make all` to create and activate virtual environment and download required packages and libraries
 3. Run `pytest` and check all tests pass
+4. Run `chmode +x create_bucket.sh`
+5. Run `.\create_bucket.sh`
+6. Run `make run-script`
 4. Go into the terraform folder in your terminal and run `terraform init`
 5. Run `terraform plan`
 6. Run `terraform apply`
