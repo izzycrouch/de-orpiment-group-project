@@ -1,12 +1,3 @@
-# data "archive_file" "lambda" {
-#   type             = "zip"
-#   output_file_mode = "0666"
-#   source_file      = "${path.module}/../extract_layer/extract_lambda.py"
-#   output_path      = "${path.module}/../extract_lambda.zip"
-# }
-
-
-
 resource "aws_lambda_function" "extract_raw_data_function" {
   function_name = "extract-func"
   role          = aws_iam_role.s3_role.arn
@@ -31,44 +22,9 @@ resource "aws_lambda_function" "extract_raw_data_function" {
   timeout = 200
 }
 
-# resource "aws_lambda_function" "zip_lambda_function" {
-#   function_name = "zip-lambda-func"
-#   role          = aws_iam_role.s3_role.arn
-
-#   s3_bucket = aws_s3_bucket.lambda_code_bucket.bucket
-#   s3_key    = "zip_lambda.zip"
-
-#   handler = "zip_lambda.lambda_handler"
-#   runtime = var.python_runtime
-
-#   # layers = [aws_lambda_layer_version.large_libraries_layer.arn, aws_lambda_layer_version.small_libraries_layer.arn]
-
-#   timeout = 60
-# }
-
 resource "aws_lambda_layer_version" "libraries_layer" {
   s3_bucket           = "libraries-layer-aci"
   s3_key              = "libraries.zip"
   layer_name          = "libraries_layer"
   compatible_runtimes = ["python3.12"]
 }
-
-
-# resource "aws_lambda_layer_version" "pyarrow_libraries_layer" {
-#   s3_bucket = aws_s3_bucket.libraries_layer_bucket.bucket
-#   s3_key    = "pyarrow_libraries.zip"
-
-#   layer_name = "pyarrow_libraries_layer"
-
-#   compatible_runtimes = [var.python_runtime]
-# }
-
-
-
-# resource "aws_lambda_layer_version" "utils_layer" {
-#   s3_bucket = aws_s3_bucket.lambda_code_bucket.bucket
-#   s3_key    = "utils_layer.zip"
-
-#   layer_name          = "utils_layer"
-#   compatible_runtimes = [var.python_runtime]
-# }
