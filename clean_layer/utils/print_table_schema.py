@@ -33,14 +33,14 @@ try:
 
     #print ten rows for each table
 
-    for table in tables:
-        rows =  db.run(f'''
-                    SELECT *
-                    FROM
-                    {table}
-                    LIMIT 10
-                    ''')
-        print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
+    # for table in tables:
+    rows =  db.run(f'''
+                SELECT *
+                FROM
+                payment_type
+                LIMIT 30
+                ''')
+    print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
 
 
 except Exception as e:
