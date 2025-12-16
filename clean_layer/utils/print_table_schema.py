@@ -37,7 +37,7 @@ try:
     rows =  db.run(f'''
                 SELECT *
                 FROM
-                payment_type
+                department
                 LIMIT 30
                 ''')
     print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
