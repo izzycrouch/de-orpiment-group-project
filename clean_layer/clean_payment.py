@@ -1,10 +1,19 @@
 import pandas as pd
 from datetime import datetime
-from clean_layer.utils.get_raw_data import get_df
+from io import BytesIO
+import boto3
 
-def clean_payment_table():
+def get_df(bucket_name: str, file_path: str) -> pd.DataFrame:
+    s3 = boto3.client("s3", region_name="eu-west-2")
 
-    df = get_df('totesys-raw-data-aci', 'payment/year=2025/month=12/day=15/batch_20251215T135936Z.parquet')
+    obj = s3.get_object(Bucket=bucket_name, Key=file_path)
+    body = obj["Body"].read()
+
+    return pd.read_parquet(BytesIO(body))
+
+def clean_payment_table(bucket_name, file_path):
+
+    df = get_df(bucket_name, file_path)
 
     df['payment_amount'] = (
         df['payment_amount'].astype(str)
