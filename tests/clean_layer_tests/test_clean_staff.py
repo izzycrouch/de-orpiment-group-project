@@ -10,6 +10,11 @@ from io import BytesIO
 @pytest.fixture(autouse=True)
 def aws_mock():
     with mock_aws():
+        yield
+
+class TestCleanStaff:
+
+    def test_correct_data_types(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
         
         bucket_name = "test-bucket"
@@ -18,11 +23,11 @@ def aws_mock():
         test_data = [{
             'staff_id' : 1, 
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'last_updated' : datetime.fromisoformat('2026-12-15 15:51:20.825099'),
+            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'department_id' : 2, 
-            'first_name' : None,
+            'first_name' : 'Harry',
             'last_name': 'Potter',
-            'email_address': 'harr@y.potter123@gmail.com'
+            'email_address': 'harry.potter123@gmail.com'
             }]
         test_df = pd.DataFrame(test_data)
         buffer = BytesIO()
@@ -31,12 +36,6 @@ def aws_mock():
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-
-        yield bucket_name, file_name
-
-class TestCleanStaff:
-    def test_correct_data_types(self):
-        bucket_name, file_name = aws_mock()
         df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
 
         assert isinstance(df, pd.DataFrame)
@@ -49,15 +48,57 @@ class TestCleanStaff:
         assert df["last_updated"].dtypes == 'datetime64[ns]'
 
     def test_no_null_values(self):
-        bucket_name, file_name = aws_mock()
+        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+        
+        bucket_name = "test-bucket"
+        file_name = "staff/example.parquet"
+
+        test_data = [{
+            'staff_id' : 1, 
+            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+            'department_id' : 2, 
+            'first_name' : None,
+            'last_name': 'Potter',
+            'email_address': None
+            }]
+        test_df = pd.DataFrame(test_data)
+        buffer = BytesIO()
+        test_df.to_parquet(buffer, index=False)
+        buffer.seek(0)
+
+        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
         df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
     
         assert len(df['first_name']) == 0
+        assert len(df['email_address']) == 0
+
         null_mask = df.isnull().any(axis=1)
         assert null_mask.any() == False
 
     def test_valid_datetime(self):
-        bucket_name, file_name = aws_mock()
+        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+        
+        bucket_name = "test-bucket"
+        file_name = "staff/example.parquet"
+
+        test_data = [{
+            'staff_id' : 1, 
+            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+            'last_updated' : datetime.fromisoformat('2026-12-16 15:51:20.825099'),
+            'department_id' : 2, 
+            'first_name' : 'Harry',
+            'last_name': 'Potter',
+            'email_address': 'harry.potter123@gmail.com'
+            }]
+        test_df = pd.DataFrame(test_data)
+        buffer = BytesIO()
+        test_df.to_parquet(buffer, index=False)
+        buffer.seek(0)
+
+        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
         df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
 
         today = pd.Timestamp.now()
@@ -66,7 +107,27 @@ class TestCleanStaff:
         assert (df['last_updated'] <= today).all()
         
     def test_email_validation(self):
-        bucket_name, file_name = aws_mock()
+        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+        
+        bucket_name = "test-bucket"
+        file_name = "staff/example.parquet"
+
+        test_data = [{
+            'staff_id' : 1, 
+            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+            'department_id' : 2, 
+            'first_name' : 'Harry',
+            'last_name': 'Potter',
+            'email_address': 'har@ry.potter123@gmail.com'
+            }]
+        test_df = pd.DataFrame(test_data)
+        buffer = BytesIO()
+        test_df.to_parquet(buffer, index=False)
+        buffer.seek(0)
+
+        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
         df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
 
         pattern = r"^[a-zA-Z0-9._%+'-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
