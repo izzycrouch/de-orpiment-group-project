@@ -1,11 +1,11 @@
-from extract_layer.utils.connection import connect_to_db, close_db_connection
+from clean_layer.utils.connection import connect_to_db, close_db_connection
 import pandas as pd
 from datetime import datetime
 
 def get_db():
     db = None
     try:
-        db = connect_to_db()  
+        db = connect_to_db()
 
         rows = db.run(f"""
             SELECT * FROM payment
@@ -13,10 +13,10 @@ def get_db():
         """)
 
         df = pd.DataFrame(data=rows, columns=pd.Index([
-            "payment_id","created_at","last_updated", "transaction_id", "counterparty_id", "payment_amount", "currency_id", 
+            "payment_id","created_at","last_updated", "transaction_id", "counterparty_id", "payment_amount", "currency_id",
             "payment_type_id", "paid", "payment_date", "company_ac_number", "counterparty_ac_number"
             ]))
-        
+
         #print(df.head(20))
         return df
 
@@ -40,7 +40,7 @@ def clean_payment_table(df):
 
 
     df['payment_date'] = pd.to_datetime(df['payment_date'], format='%Y-%m-%d', errors='coerce')
-    
+
     today = datetime.today()
     invalid_dates = df['payment_date'] > today
     df = df.drop(df[invalid_dates].index)
@@ -50,7 +50,7 @@ def clean_payment_table(df):
 
     print(null_rows)
 
-    df = df.dropna(how='any',axis=0) 
+    df = df.dropna(how='any',axis=0)
 
     #print(invalid_dates)
 
@@ -70,7 +70,7 @@ def clean_payment_table(df):
     #     'company_ac_number': 'int64',
     #     'counterparty_ac_number': 'int64'
     # }
-    
+
     #print(df.head(20))
 
 clean_payment_table(df=df)
