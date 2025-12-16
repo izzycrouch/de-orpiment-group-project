@@ -5,6 +5,10 @@ db = None
 try:
     db = connect_to_db()
     tables =  ['counterparty', 'address', 'department', 'purchase_order', 'staff', 'payment_type', 'payment', 'transaction', 'design', 'sales_order', 'currency']
+
+
+    ##print schema for each table
+
     # for table in tables:
     #     # rows =  db.run(f"""
     #     # SELECT *
@@ -27,20 +31,17 @@ try:
     #     print(tabulate(schema_rows, headers=fields, tablefmt="grid"))
 
 
-    rows =  db.run('''
-                   SELECT *
-                   FROM
-                   transaction
-                   LIMIT 30
-                   ''')
+    #print ten rows for each table
 
+    for table in tables:
+        rows =  db.run(f'''
+                    SELECT *
+                    FROM
+                    {table}
+                    LIMIT 10
+                    ''')
+        print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
 
-
-    df = pd.DataFrame(rows, columns=columns)
-
-    print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
-
-#db_column method (pg8000)
 
 except Exception as e:
     print(e)
