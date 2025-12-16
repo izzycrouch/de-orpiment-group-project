@@ -1,15 +1,15 @@
-from io import BytesIO
-import boto3
+# from io import BytesIO
+# import boto3
 import pandas as pd
+from clean_layer.utils.get_df import get_df
 
+# def get_df(bucket_name: str, file_name: str) -> pd.DataFrame:
+#     s3 = boto3.client("s3", region_name="eu-west-2")
 
-def get_df(bucket_name: str, file_name: str) -> pd.DataFrame:
-    s3 = boto3.client("s3", region_name="eu-west-2")
+#     obj = s3.get_object(Bucket=bucket_name, Key=file_name)
+#     body = obj["Body"].read()
 
-    obj = s3.get_object(Bucket=bucket_name, Key=file_name)
-    body = obj["Body"].read()
-
-    return pd.read_parquet(BytesIO(body))
+#     return pd.read_parquet(BytesIO(body))
 
 
 def clean_design(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
@@ -29,7 +29,7 @@ def clean_design(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     
     # drops row where created_at and last_updated after current time
     now = pd.Timestamp.now()
-    design_df = design_df[(design_df['created_at'] <= now) & (design_df['last_updated'] <= now)]
+    design_df = design_df[(design_df['created_at'] <= now) & (design_df['last_updated'] <= now) & (design_df['created_at'] <= design_df['last_updated'])]
 
     # drop rows where file_location doesnt start with '/'
     design_df = design_df[(design_df['file_location'].str.startswith('/'))]
