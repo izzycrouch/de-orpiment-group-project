@@ -7,7 +7,7 @@ import json
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s') 
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s')
 
 BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
 
@@ -36,3 +36,6 @@ def write_to_s3(client, data, bucket, key):
     except ClientError as c:
         logger.info("Boto3 ClientError: %s", str(c))
         return False
+
+## connect to raw data bucket
+## get the parquet before hte laster
