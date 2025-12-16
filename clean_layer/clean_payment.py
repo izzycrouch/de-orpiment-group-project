@@ -16,8 +16,9 @@ def get_db():
             "payment_id","created_at","last_updated", "transaction_id", "counterparty_id", "payment_amount", "currency_id", 
             "payment_type_id", "paid", "payment_date", "company_ac_number", "counterparty_ac_number"
             ]))
-        return df
+        
         #print(df.head(20))
+        return df
 
     except Exception as e:
         print(e)
@@ -44,7 +45,12 @@ def clean_payment_table(df):
     invalid_dates = df['payment_date'] > today
     df = df.drop(df[invalid_dates].index)
 
-    print(df.dtypes)
+    null_mask = df.isnull().any(axis=1)
+    null_rows = df[null_mask]
+
+    print(null_rows)
+
+    df = df.dropna(how='any',axis=0) 
 
     #print(invalid_dates)
 
