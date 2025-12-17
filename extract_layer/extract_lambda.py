@@ -1,4 +1,3 @@
-
 import logging
 import pandas as pd
 from datetime import datetime, timezone
@@ -7,9 +6,6 @@ from extract_layer.utils.save_data import save_data
 from extract_layer.utils.extraction_info import get_latest_extraction_info, save_new_extraction_info
 import os
 import io
-
-
-
 
 def lambda_handler(event, content):
     logger = logging.getLogger(__name__)

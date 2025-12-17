@@ -26,10 +26,18 @@ In this project, we have created applications that will extract, transform, and 
 ## How to run
 1. Clone repo
 2. Run `make all` to create and activate virtual environment and download required packages and libraries
-3. Run `pytest` and check all tests pass
-4. Run `chmode +x create_bucket.sh`
-5. Run `.\create_bucket.sh`
-6. Run `make run-script`
-4. Go into the terraform folder in your terminal and run `terraform init`
-5. Run `terraform plan`
-6. Run `terraform apply`
+3. Set up a .env file with the following variables:
+    - PG_USER={your_pg_username}
+    - PG_PASSWORD=test_pass
+    - PG_DATABASE=test_db
+    - PG_HOST=localhost
+    - PG_PORT=5432
+    - ENV=dev
+4. Run `chmod +x test_db_script.sh`
+5. Run `pytest` and check all tests pass
+6. Run `chmod +x create_bucket.sh`
+7. Run `.\create_bucket.sh`
+8. Run `make run-script`
+9. Go into the terraform folder in your terminal and run `terraform init`
+10. Run `terraform plan`
+11. Run `terraform apply`
