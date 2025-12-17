@@ -34,10 +34,11 @@ In this project, we have created applications that will extract, transform, and 
     - PG_PORT=5432
     - ENV=dev
 4. Run `chmod +x test_db_script.sh`
-5. Run `pytest` and check all tests pass
-6. Run `chmod +x create_bucket.sh`
-7. Run `.\create_bucket.sh`
-8. Run `make run-script`
-9. Go into the terraform folder in your terminal and run `terraform init`
-10. Run `terraform plan`
-11. Run `terraform apply`
+5. Run `.\test_db_script.sh`
+6. Run `pytest` and check all tests pass
+7. Run `chmod +x create_bucket.sh`
+8. Run `.\create_bucket.sh`
+9. Run `make run-script`
+10. Go into the terraform folder in your terminal and run `terraform init`
+11. Run `terraform plan`
+12. Run `terraform apply`
