@@ -37,7 +37,7 @@ try:
     rows =  db.run(f'''
                 SELECT *
                 FROM
-                purchase_order
+                counterparty
                 LIMIT 30
                 ''')
     print(tabulate(rows, headers= [col["name"] for col in db.columns], tablefmt="grid"))
