@@ -13,7 +13,6 @@ def aws_mock():
         yield
 
 class TestCleanAddress:
-
     def test_correct_data_types(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
         
