@@ -1,4 +1,4 @@
-from clean_layer.clean_payment import clean_payment_table
+from clean_layer.clean_func.clean_payment import clean_payment_table
 import pandas as pd
 from datetime import datetime
 import pytest
@@ -16,15 +16,15 @@ class TestCleanPayment:
 
     def test_correct_data_types(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'payment_id' : 1, 
+            'payment_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'transaction_id' : 2, 
+            'transaction_id' : 2,
             'counterparty_id' : 3,
             'payment_amount': 2.50,
             'currency_id': 4,
@@ -54,15 +54,15 @@ class TestCleanPayment:
 
     def test_drop_null_values(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'payment_id' : 1, 
+            'payment_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'transaction_id' : 2, 
+            'transaction_id' : 2,
             'counterparty_id' : 3,
             'payment_amount': None,
             'currency_id': 4,
@@ -89,15 +89,15 @@ class TestCleanPayment:
 
     def test_valid_datetime(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'payment_id' : 1, 
+            'payment_id' : 1,
             'created_at' : datetime.fromisoformat('2026-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'transaction_id' : 2, 
+            'transaction_id' : 2,
             'counterparty_id' : 3,
             'payment_amount': 2.50,
             'currency_id': 4,
@@ -117,9 +117,8 @@ class TestCleanPayment:
         df = clean_payment_table(file_path=file_name, bucket_name=bucket_name)
 
         today = datetime.today()
-        
+
         assert (df['payment_date'] <= today).all()
         assert (df['created_at'] <= today).all()
         assert len(df['created_at']) == 0
         assert (df['last_updated'] <= today).all()
-        

@@ -24,7 +24,5 @@ def clean_sales_order(file_path: str, bucket_name: str = 'totesys-raw-data-aci')
     now = pd.Timestamp.now()
     df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
     df = df[(df['created_at'] <= df['agreed_delivery_date']) & (df['created_at'] <= df['agreed_payment_date'])]
-    
-    return df
 
-clean_sales_order('sales_order/year=2025/month=12/day=15/batch_20251215T135936Z.parquet')
+    return df

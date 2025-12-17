@@ -5,7 +5,7 @@ from moto import mock_aws
 from datetime import datetime
 from io import BytesIO
 
-from clean_layer.clean_payment_type import clean_payment_type
+from clean_layer.clean_func.clean_payment_type import clean_payment_type
 
 
 @pytest.fixture(autouse=True)

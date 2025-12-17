@@ -1,5 +1,5 @@
 from clean_layer.utils.save_df_into_parquet import save_data
-from clean_layer.utils.get_raw_data import get_df
+from clean_layer.utils.get_df import get_df
 import pytest
 from moto import mock_aws
 import boto3

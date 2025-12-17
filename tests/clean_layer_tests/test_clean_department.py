@@ -5,7 +5,7 @@ from moto import mock_aws
 from datetime import datetime
 from io import BytesIO
 
-from clean_layer.clean_department import clean_department
+from clean_layer.clean_func.clean_department import clean_department
 
 
 @pytest.fixture(autouse=True)

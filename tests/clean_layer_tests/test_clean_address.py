@@ -1,4 +1,4 @@
-from clean_layer.clean_address import clean_address_table
+from clean_layer.clean_func.clean_address import clean_address_table
 import pandas as pd
 from datetime import datetime
 import pytest
@@ -15,15 +15,15 @@ def aws_mock():
 class TestCleanAddress:
     def test_correct_data_types(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'address_id' : 1, 
+            'address_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : '123 Some Street', 
+            'address_line_1' : '123 Some Street',
             'address_line_2' : None,
             'district': 'Test',
             'city': 'Test City',
@@ -51,15 +51,15 @@ class TestCleanAddress:
 
     def test_drops_null_values_except_allows_null_columns(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'address_id' : 1, 
+            'address_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : None, 
+            'address_line_1' : None,
             'address_line_2' : None,
             'district': 'Test',
             'city': 'Test City',
@@ -81,18 +81,18 @@ class TestCleanAddress:
 
         null_mask = df.isnull().any(axis=1)
         assert null_mask.any() == False
-        
+
     def test_valid_datetime(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'address_id' : 1, 
+            'address_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2026-12-15 15:51:20.825099'),
-            'address_line_1' : '123 Some Street', 
+            'address_line_1' : '123 Some Street',
             'address_line_2' : None,
             'district': 'Test',
             'city': 'Test City',
@@ -111,22 +111,22 @@ class TestCleanAddress:
 
 
         today = datetime.today()
-        
+
         assert (df['created_at'] <= today).all()
         assert (df['last_updated'] <= today).all()
         assert len(df['last_updated']) == 0
 
     def test_capitalises_correct_words(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'address_id' : 1, 
+            'address_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : '123 some Street', 
+            'address_line_1' : '123 some Street',
             'address_line_2' : None,
             'district': 'Test',
             'city': 'test city',
@@ -149,15 +149,15 @@ class TestCleanAddress:
 
     def test_drops_invalid_phone(self):
         mock_s3 = boto3.client('s3', region_name='eu-west-2')
-        
+
         bucket_name = "test-bucket"
         file_name = "payment/example.parquet"
 
         test_data = [{
-            'address_id' : 1, 
+            'address_id' : 1,
             'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
             'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : '123 Some Street', 
+            'address_line_1' : '123 Some Street',
             'address_line_2' : None,
             'district': 'Test',
             'city': 'Test City',

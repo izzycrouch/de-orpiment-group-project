@@ -1,19 +1,7 @@
 import pandas as pd
-from io import BytesIO
-import boto3
+from clean_layer.utils.get_df import get_df
 
-def get_df(bucket_name: str, file_path: str) -> pd.DataFrame:
-    s3 = boto3.client("s3", region_name="eu-west-2")
 
-    obj = s3.get_object(Bucket=bucket_name, Key=file_path)
-    body = obj["Body"].read()
-
-    return pd.read_parquet(BytesIO(body))
-
-# - make sure capital letters or countries, district, city
-# - make sure and or & - choose one
-# - split address line 1
-# - check valid date and time
 
 def clean_address_table(bucket_name, file_path):
 
@@ -50,5 +38,3 @@ def clean_address_table(bucket_name, file_path):
     df = df.dropna(subset=non_null)
 
     return df
-
-#clean_address_table('totesys-raw-data-aci', 'address/year=2025/month=12/day=15/batch_20251215T135936Z.parquet')

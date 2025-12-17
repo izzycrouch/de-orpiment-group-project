@@ -5,7 +5,7 @@ from moto import mock_aws
 from datetime import datetime
 from io import BytesIO
 
-from clean_layer.clean_purchase_order import clean_purchase_order
+from clean_layer.clean_func.clean_purchase_order import clean_purchase_order
 
 
 @pytest.fixture(autouse=True)
