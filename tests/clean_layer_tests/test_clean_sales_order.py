@@ -264,6 +264,7 @@ class TestCleanSalesOrder:
         result = clean_sales_order(file_path=file_name, bucket_name=bucket_name)
 
         assert result['staff_id'].iloc[0] == 1
+        assert result.shape == (1, 12)
 
     
     def test_clean_sales_order_removes_data_if_created_at_date_after_current_time(self):
