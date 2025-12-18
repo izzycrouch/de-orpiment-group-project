@@ -17,5 +17,5 @@ def clean_currency(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
 
     valid_currency_codes = ['USD', 'GBP', 'EUR']
 
-    df = df[df['currency_code'].isin(valid_currency_codes) == True]
+    df = df[df['currency_code'].isin(valid_currency_codes)]
     return df
