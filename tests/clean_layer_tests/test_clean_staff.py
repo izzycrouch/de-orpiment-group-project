@@ -1,4 +1,4 @@
-from clean_layer.clean_func.clean_staff import clean_staff_table
+from clean_layer.clean_func.clean_staff import clean_staff
 import pandas as pd
 from datetime import datetime
 import pytest
@@ -36,7 +36,7 @@ class TestCleanStaff:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_staff(file_path=file_name, bucket_name=bucket_name)
 
         assert isinstance(df, pd.DataFrame)
         assert df["staff_id"].dtypes == int
@@ -69,7 +69,7 @@ class TestCleanStaff:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_staff(file_path=file_name, bucket_name=bucket_name)
 
         assert len(df['first_name']) == 0
         assert len(df['email_address']) == 0
@@ -99,7 +99,7 @@ class TestCleanStaff:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_staff(file_path=file_name, bucket_name=bucket_name)
 
         today = pd.Timestamp.now()
 
@@ -128,7 +128,7 @@ class TestCleanStaff:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_staff_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_staff(file_path=file_name, bucket_name=bucket_name)
 
         pattern = r"^[a-zA-Z0-9._%+'-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         assert df["email_address"].str.match(pattern).all()

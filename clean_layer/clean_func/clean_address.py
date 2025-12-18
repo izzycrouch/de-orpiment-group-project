@@ -3,7 +3,7 @@ from clean_layer.utils.get_df import get_df
 
 
 
-def clean_address_table(bucket_name, file_path):
+def clean_address(bucket_name, file_path):
 
     df = get_df(bucket_name, file_path)
 

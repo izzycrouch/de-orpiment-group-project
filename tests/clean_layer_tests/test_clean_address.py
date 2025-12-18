@@ -1,4 +1,4 @@
-from clean_layer.clean_func.clean_address import clean_address_table
+from clean_layer.clean_func.clean_address import clean_address
 import pandas as pd
 from datetime import datetime
 import pytest
@@ -38,7 +38,7 @@ class TestCleanAddress:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
         assert isinstance(df, pd.DataFrame)
         assert df["address_id"].dtypes == int
@@ -74,7 +74,7 @@ class TestCleanAddress:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
         assert len(df['address_line_1']) == 0
         assert len(df['country']) == 0
@@ -107,7 +107,7 @@ class TestCleanAddress:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
 
         today = datetime.today()
@@ -141,7 +141,7 @@ class TestCleanAddress:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
         assert (df['address_line_1'] == '123 Some Street').all()
         assert (df['city'] == 'Test City').all()
@@ -172,6 +172,6 @@ class TestCleanAddress:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
         assert len(df['phone']) == 0
