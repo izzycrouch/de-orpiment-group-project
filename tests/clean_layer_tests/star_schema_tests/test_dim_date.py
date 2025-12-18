@@ -19,7 +19,7 @@ class TestDimDate:
     def test_dim_date_returns_correct_column_datatypes(self):
         result = create_dim_date(start='2025-11-01', end='2025-11-30')
 
-        assert result['date_id'].dtype == 'int64'
+        assert str(result['date_id'].dtype) == 'datetime64[ns]'
         assert result['year'].dtype == 'int32'
         assert result['month'].dtype == 'int32'
         assert result['day'].dtype == 'int32'
