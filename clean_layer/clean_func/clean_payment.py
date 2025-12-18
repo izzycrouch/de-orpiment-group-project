@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 from clean_layer.utils.get_df import get_df
 
-def clean_payment_table(bucket_name, file_path):
+def clean_payment(bucket_name, file_path):
 
     df = get_df(bucket_name, file_path)
 

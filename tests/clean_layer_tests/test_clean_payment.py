@@ -1,4 +1,4 @@
-from clean_layer.clean_func.clean_payment import clean_payment_table
+from clean_layer.clean_func.clean_payment import clean_payment
 import pandas as pd
 from datetime import datetime
 import pytest
@@ -41,7 +41,7 @@ class TestCleanPayment:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_payment_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_payment(file_path=file_name, bucket_name=bucket_name)
 
         assert isinstance(df, pd.DataFrame)
         assert df["payment_id"].dtypes == int
@@ -79,7 +79,7 @@ class TestCleanPayment:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_payment_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_payment(file_path=file_name, bucket_name=bucket_name)
 
         assert len(df['company_ac_number']) == 0
         assert len(df['payment_amount']) == 0
@@ -114,7 +114,7 @@ class TestCleanPayment:
 
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_payment_table(file_path=file_name, bucket_name=bucket_name)
+        df = clean_payment(file_path=file_name, bucket_name=bucket_name)
 
         today = datetime.today()
 
