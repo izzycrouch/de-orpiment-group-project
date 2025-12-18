@@ -28,6 +28,10 @@ def lambda_func(event, context):
 def clean_data():
     pass
 
+
+
+
+
 def write_to_s3(client, data, bucket, key):
     body = json.dumps(data)
     try:
