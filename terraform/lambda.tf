@@ -10,7 +10,7 @@ resource "aws_lambda_function" "extract_raw_data_function" {
 
   layers = [
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:20",
-  aws_lambda_layer_version.libraries_layer.arn]
+    aws_lambda_layer_version.libraries_layer.arn]
 
   environment {
     variables = {
@@ -27,4 +27,28 @@ resource "aws_lambda_layer_version" "libraries_layer" {
   s3_key              = "libraries.zip"
   layer_name          = "libraries_layer"
   compatible_runtimes = ["python3.12"]
+}
+
+resource "aws_lambda_function" "transform_data_function" {
+  function_name = "transform-func"
+  role          = aws_iam_role.s3_role.arn
+
+  s3_bucket = "lambda-func-code-aci"
+  s3_key    = "transform_lambda.zip"
+
+  handler = "clean_layer.clean.lambda_handler"
+  runtime = var.python_runtime
+
+  layers = [
+    "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:20",
+    aws_lambda_layer_version.libraries_layer.arn]
+
+  environment {
+    variables = {
+      S3_BUCKET_NAME = "totesys-transformed-data-aci"
+      ENV            = "prod"
+    }
+  }
+
+  timeout = 200
 }
