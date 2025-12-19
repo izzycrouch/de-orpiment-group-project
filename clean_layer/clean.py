@@ -4,42 +4,197 @@ from botocore.exceptions import ClientError
 import os
 from datetime import datetime as dt
 import json
+from clean_layer.clean_func import clean_address,clean_counterparty,clean_currency,clean_department,clean_design,clean_payment,clean_payment_type,clean_purchase_order,clean_sales_order,clean_staff,clean_transcation
+from clean_layer.star_schema_tables import dim_counterparty,dim_currency,dim_date,dim_design,dim_location,dim_payment_type,dim_staff,dim_transaction,fact_payment,fact_purchase_order,fact_sales_order
+import pandas as pd
+from clean_layer.utils.save_df_into_parquet import save_data
+from datetime import datetime, timezone
+from clean_layer.utils.get_df import get_df
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s')
+clean_func_map = {'counterparty':clean_counterparty.clean_counterparty,
+ 'address':clean_address.clean_address,
+ 'department':clean_department.clean_department,
+ 'purchase_order':clean_purchase_order.clean_purchase_order,
+ 'staff':clean_staff.clean_staff,
+ 'payment_type':clean_payment_type.clean_payment_type,
+ 'payment':clean_payment.clean_payment,
+ 'transaction':clean_transcation.clean_transcation,
+ 'design':clean_design.clean_design,
+ 'sales_order':clean_sales_order.clean_sales_order,
+ 'currency':clean_currency.clean_currency}
 
-BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s')
 
-def lambda_func(event, context):
+# BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
+# BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
+
+
+def lambda_handler(event, context):
+
+    processed_bucket_name = 'test_processed_bucket'
+    raw_bucket_name = 'test_raw_bucket'
+
+    #inital build:
+    #check anything in processed bucket,if empty:
+    #iterate the raw data bucket, for every file do initial build
+    cleaned_df_dict ={}
     s3_client = boto3.client("s3")
-    timestamp = str(int(dt.timestamp(dt.now())))
+    processed_objects = s3_client.list_objects_v2(Bucket=processed_bucket_name)
 
-    output_data = clean_data()
+    if not processed_objects['KeyCount']:
+        raw_objects = s3_client.list_objects_v2(Bucket=raw_bucket_name)
+        print(raw_objects)
+        tables = list(clean_func_map.keys())
+        list_keys = [content['Key'] for content in raw_objects['Contents']]
+        for prefix in tables:
+            base_df = None
+            for key in list_keys:
+                start_string = prefix + '/year='
+                if key.startswith(start_string):
 
-    key = f"clean_data_{timestamp}.json"
-    write_result = write_to_s3(s3_client, output_data, BUCKET_NAME, key)
+                    df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+                    if not isinstance(base_df, pd.DataFrame):
+                        base_df =df
+                    else:
+                        base_df = pd.concat([base_df,df], axis=0, ignore_index=True)
+            cleaned_df_dict[prefix] = base_df
 
-    if write_result:
-        logger.info("New cleaned data was written to the s3 bucket.")
+
+        dim_counterparty_df = dim_counterparty.create_dim_counterparty(address_df=cleaned_df_dict['address'],counterparty_df=cleaned_df_dict['counterparty'])
+        key = 'dim_counterparty.parquet'
+        save_data(dim_counterparty_df,key)
+
+        dim_currency_df = dim_currency.create_dim_currency(cleaned_df_dict['currency'])
+        key = 'dim_currency.parquet'
+        save_data(dim_currency_df,key)
+
+        dim_date_df = dim_date.create_dim_date()
+        key = 'dim_date.parquet'
+        save_data(dim_date_df,key)
+
+        dim_design_df = dim_design.create_dim_design(cleaned_df_dict['design'])
+        key = 'dim_design.parquet'
+        save_data(dim_design_df,key)
+
+        dim_location_df = dim_location.create_dim_location(cleaned_df_dict['address'])
+        key = 'dim_location.parquet'
+        save_data(dim_location_df,key)
+
+        dim_payment_type_df = dim_payment_type.create_dim_payment_type(cleaned_df_dict['payment_type'])
+        key = 'dim_payment_type.parquet'
+        save_data(dim_payment_type_df,key)
+
+        dim_staff_df = dim_staff.create_dim_staff(cleaned_df_dict['staff'],cleaned_df_dict['department'])
+        key = 'dim_staff.parquet'
+        save_data(dim_staff_df,key)
+
+        cleaned_department_df = cleaned_df_dict['department']
+        key = 'cleaned_department_df.parquet'
+        save_data(cleaned_department_df,key)
+
+        dim_transaction_df = dim_transaction.create_dim_transaction(cleaned_df_dict['transaction'])
+        key = 'dim_transaction.parquet'
+        save_data(dim_transaction_df,key)
+
+        fact_payment_df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df )
+        key = 'fact_payment.parquet'
+        save_data(fact_payment_df,key)
+
+
+
+        fact_purchase_order_df = fact_purchase_order.create_fact_purchase_order(dim_date_df = dim_date_df,
+                               dim_currency_df = dim_currency_df,
+                               dim_staff_df = dim_staff_df,
+                               dim_counterparty_df = dim_counterparty_df,
+                               dim_location_df = dim_location_df ,
+                               purchase_order_df = cleaned_df_dict['purchase_order'])
+
+        key = 'fact_purchase_order.parquet'
+        save_data(fact_purchase_order_df,key)
+
+        fact_sales_order_df = fact_sales_order.create_fact_sales_order(
+                                sales_order = cleaned_df_dict['sales_order'],
+                                dim_date =  dim_date_df,
+                                dim_staff = dim_staff_df,
+                                dim_counterparty = dim_counterparty_df,
+                                dim_currency = dim_currency_df,
+                                dim_design = dim_design_df,
+                                dim_location = dim_location_df )
+        key = 'fact_sales_order.parquet'
+        save_data(fact_sales_order_df,key)
+
+
     else:
-        logger.info("No new cleaned data was written to the s3 bucket.")
+        key = event['Records'][0]['s3']['object']['key']
+        tables = list(clean_func_map.keys())
 
-def clean_data():
-    pass
+        def update_dim(df,processed_bucket_name,create_func,key):
+            dim_df =  get_df(processed_bucket_name,key)
+            df = create_func(df)
+            new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+            save_data(new_df,key)
+        dim_func_map = {
+                    'address': [dim_location.create_dim_location,'dim_location.parquet'],
+                    'payment_type': [dim_payment_type.create_dim_payment_type,'dim_payment_type.parquet'],
+                    'transaction': [dim_transaction.create_dim_transaction,'dim_transaction.parquet'],
+                    'design': [dim_design.create_dim_design,'dim_design.parquet'],
+                    'currency':[dim_currency.create_dim_currency,'dim_currency.parquet']}
+
+        for prefix in tables:
+            start_string = prefix + '/year='
+            if key.startswith(start_string):
+                df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+                if prefix in list(dim_func_map.keys()):
+                    update_dim(df,processed_bucket_name,dim_func_map[prefix][0],dim_func_map[prefix][1])
+
+                elif prefix=='counterparty':
+                    dim_counterparty.update_counterparty(df,processed_bucket_name)
+
+                elif prefix == 'staff':
+                    dim_staff.update_dim_staff(df,processed_bucket_name)
+
+                elif prefix == 'sales_order':
+                    pass
+
+                elif prefix == 'purchase_order':
+                    pass
+                elif prefix == 'payment':
+                    pass
 
 
 
 
+            # clean_func_map = {'counterparty':,
+            # 'address':,
+            # 'department':,
+            # 'purchase_order':,
+            # 'staff':,
+            # 'payment_type':,
+            # 'payment':,
+            # 'transaction':,
+            # 'design':,
+            # 'sales_order':,
+            # 'currency':}
 
-def write_to_s3(client, data, bucket, key):
-    body = json.dumps(data)
-    try:
-        client.put_object(Bucket=bucket, Key=key, Body=body)
-        return True
-    except ClientError as c:
-        logger.info("Boto3 ClientError: %s", str(c))
-        return False
 
-## connect to raw data bucket
-## get the parquet before hte laster
+            # dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+            # dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+            # dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+            # dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+            # dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+            # dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+            # dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+            # dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+            # fact_payment_df = get_df(processed_bucket_name,'fact_payment.parquet')
+            # fact_purchase_order_df = get_df(processed_bucket_name,'fact_purchase_order.parquet')
+            # fact_sales_order_df = get_df(processed_bucket_name,'fact_sales_order.parquet')
+
+
+# 'department'
+# 'staff'
+# 'counterparty'
+#this three should handle separtely
+#also fact table
+
