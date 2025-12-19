@@ -16,5 +16,8 @@ aws s3api create-bucket \
   --region eu-west-2 \
   --create-bucket-configuration LocationConstraint=eu-west-2
 
-
+aws s3api create-bucket \
+  --bucket totesys-transformed-data-aci \
+  --region eu-west-2 \
+  --create-bucket-configuration LocationConstraint=eu-west-2
 
