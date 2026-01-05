@@ -26,15 +26,15 @@ clean_func_map = {'counterparty':clean_counterparty.clean_counterparty,
 # logger = logging.getLogger(__name__)
 # logger.setLevel(logging.INFO)
 # logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s')
+raw_bucket_name = os.environ["S3_RAW_BUCKET_NAME"]
+processed_bucket_name = os.environ["S3_PROCESSED_BUCKET_NAME"]
 
-# BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
-# BUCKET_NAME = os.environ["S3_BUCKET_NAME"]
 
 
 def lambda_handler(event, context):
 
-    processed_bucket_name = 'test_processed_bucket'
-    raw_bucket_name = 'test_raw_bucket'
+    # processed_bucket_name = 'test_processed_bucket'
+    # raw_bucket_name = 'test_raw_bucket'
 
     #inital build:
     #check anything in processed bucket,if empty:

@@ -10,7 +10,7 @@ resource "aws_lambda_function" "extract_raw_data_function" {
 
   layers = [
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:20",
-    aws_lambda_layer_version.libraries_layer.arn]
+  aws_lambda_layer_version.libraries_layer.arn]
 
   environment {
     variables = {
@@ -41,12 +41,13 @@ resource "aws_lambda_function" "transform_data_function" {
 
   layers = [
     "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python312:20",
-    aws_lambda_layer_version.libraries_layer.arn]
+  aws_lambda_layer_version.libraries_layer.arn]
 
   environment {
     variables = {
-      S3_BUCKET_NAME = "totesys-transformed-data-aci"
-      ENV            = "prod"
+      S3_RAW_BUCKET_NAME       = "totesys-raw-data-aci"
+      S3_PROCESSED_BUCKET_NAME = "totesys-transformed-data-aci-1"
+      ENV                      = "prod"
     }
   }
 
