@@ -37,11 +37,25 @@ dev-setup: bandit coverage
 # Run security test
 security-test:
 	$(call execute_in_env, bandit -lll -r ./clean_layer ./extract_layer)
+check-coverage:
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --cov=./clean_layer ./extract_layer tests/)
 
 # Run all
-all: create-environment requirements dev-setup security-test
+all: create-environment requirements dev-setup security-test check-coverage
 
-# Run bash script
-run-script:
+# Run script for pytest
+test-db:
+	chmod +x test_db_script.sh
+	.\test_db_script.sh
+unit-test:
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
+run-pytest: test-db unit-test
+
+# Run bash scripts
+create-bucket:
+	chmod +x create_bucket.sh
+	.\create_bucket.sh
+zip-layer:
 	chmod +x upload_layer_func.sh
 	./upload_layer_func.sh
+run-script: create-bucket zip-layer
