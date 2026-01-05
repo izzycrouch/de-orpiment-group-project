@@ -5,6 +5,7 @@ from clean_layer.star_schema_tables import dim_counterparty,dim_currency,dim_dat
 import pandas as pd
 from clean_layer.utils.save_df_into_parquet import save_data
 from clean_layer.utils.get_df import get_df
+import os
 
 clean_func_map = {'counterparty':clean_counterparty.clean_counterparty,
  'address':clean_address.clean_address,
@@ -62,7 +63,7 @@ def lambda_handler(event, context):
         except Exception as e:
             logger.error("MAJOR_ERROR:", e)
             print("ERROR IN LAMBDA:", e)
-            raise 
+            raise
 
 
         dim_counterparty_df = dim_counterparty.create_dim_counterparty(address_df=cleaned_df_dict['address'],counterparty_df=cleaned_df_dict['counterparty'])
@@ -231,5 +232,5 @@ def lambda_handler(event, context):
         except Exception as e:
             logger.error("MAJOR_ERROR:", e)
             print("ERROR IN LAMBDA:", e)
-            raise 
+            raise
 
