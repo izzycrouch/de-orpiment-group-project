@@ -1,4 +1,4 @@
-from clean_layer.clean import lambda_func
+from clean_layer.clean import lambda_handler
 from moto import mock_aws
 import pytest
 import boto3
@@ -55,7 +55,7 @@ class TestCleanBucket:
                       'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099')}])
         self._upload_parquet(mock_s3_bucket=mock_s3_bucket, df=df, key=key,bucket_name='test_raw_bucket')
 
-        lambda_func({
+        lambda_handler({
                     "Records": [
                         {
                         "eventVersion": "2.1",

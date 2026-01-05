@@ -20,6 +20,9 @@ jobs:
 
       - name: run-all
         run: make all
+      
+      - name: pytest
+        run: make run-pytest
 
   run-bash-script:
     name: run-bash-script
