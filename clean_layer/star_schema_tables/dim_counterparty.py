@@ -3,6 +3,7 @@ from clean_layer.utils.get_df import get_df
 from clean_layer.utils.save_df_into_parquet import save_data
 
 def create_dim_counterparty( counterparty_df , address_df,id_col_name ='address_id' ):
+
     columns = ['counterparty_id', 'counterparty_legal_name', 'legal_address_id']
     c_df = counterparty_df[columns]
 
