@@ -61,7 +61,9 @@ def lambda_handler(event, content):
         save_new_extraction_info(new_json,BUCKET_NAME)
 
     except Exception as e:
+        logger.error("MAJOR_ERROR: Ingestion failed", e)
         print("ERROR IN LAMBDA:", e)
+        raise
     finally:
         if db:
             close_db_connection(db)
