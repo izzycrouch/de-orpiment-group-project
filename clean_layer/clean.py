@@ -135,6 +135,9 @@ def lambda_handler(event, context):
             df = create_func(df)
             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
             save_data(new_df,key)
+
+
+
         dim_func_map = {
                     'address': [dim_location.create_dim_location,'dim_location.parquet'],
                     'payment_type': [dim_payment_type.create_dim_payment_type,'dim_payment_type.parquet'],
@@ -155,13 +158,75 @@ def lambda_handler(event, context):
                 elif prefix == 'staff':
                     dim_staff.update_dim_staff(df,processed_bucket_name)
 
+                elif prefix == 'department':
+                    dim_staff.update_dim_staff(df,processed_bucket_name)
+
+#fact table
                 elif prefix == 'sales_order':
-                    pass
+                    #get all the dim table use get_df
+                    #get old fact use get_df
+                    #using the dim tables to make
+                    # using fact_sales_order.create_fact_sales_order generate new table
+                    # pd.concat([dim_df,df],axis=0, ignore_index=True)
+                    dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+                    dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+                    dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+                    dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+                    dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+                    dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+                    dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+                    dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+                    key = 'fact_sales_order.parquet'
+                    dim_df =  get_df(processed_bucket_name,key)
+                    df = fact_sales_order.create_fact_sales_order(
+                                sales_order = df,
+                                dim_date_df = dim_date_df,
+                                dim_staff = dim_staff_df,
+                                dim_counterparty = dim_counterparty_df,
+                                dim_currency = dim_currency_df,
+                                dim_design = dim_design_df,
+                                dim_location = dim_location_df )
+                    new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+                    save_data(new_df,key)
 
                 elif prefix == 'purchase_order':
-                    pass
+                    dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+                    dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+                    dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+                    dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+                    dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+                    dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+                    dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+                    dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+                    key = 'fact_purchase_order.parquet'
+                    dim_df =  get_df(processed_bucket_name,key)
+                    df = fact_purchase_order.create_fact_purchase_order(dim_date_df = dim_date_df,
+                               dim_currency_df = dim_currency_df,
+                               dim_staff_df = dim_staff_df,
+                               dim_counterparty_df = dim_counterparty_df,
+                               dim_location_df = dim_location_df ,
+                               purchase_order_df = cleaned_df_dict['purchase_order'])
+
+                    new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+                    save_data(new_df,key)
+
                 elif prefix == 'payment':
-                    pass
+                    dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+                    dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+                    dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+                    dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+                    dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+                    dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+                    dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+                    dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+                    key = 'fact_payment.parquet'
+                    dim_df =  get_df(processed_bucket_name,key)
+                    df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
+                    new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+                    save_data(new_df,key)
+
+
+
 
 
 

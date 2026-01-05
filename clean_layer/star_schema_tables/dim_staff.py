@@ -28,4 +28,3 @@ def update_dim_staff(df,processed_bucket_name):
     new_df = pd.concat([dim_staff_df,new_dim_staff],axis=0, ignore_index=True)
     key = 'dim_staff.parquet'
     save_data(new_df,key)
-
