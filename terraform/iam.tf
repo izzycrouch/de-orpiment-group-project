@@ -48,7 +48,6 @@ resource "aws_iam_role_policy_attachment" "attach_secrets" {
 }
 
 
-
 #create policy
 resource "aws_iam_policy" "s3_write_policy" {
   name   = "write_s3_bucket"
@@ -62,5 +61,23 @@ resource "aws_iam_role_policy_attachment" "attach_read" {
   policy_arn = aws_iam_policy.s3_write_policy.arn
 }
 
+# policy for logging to cloudwatch
+data "aws_iam_policy_document" "cw_document" {
+  statement {
+    effect  = "Allow"
+    actions = [ "logs:CreateLogGroup" ]
 
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
 
+  statement {
+    effect  = "Allow"
+    actions = [ "logs:CreateLogStream", "logs:PutLogEvents" ]
+
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*:*"
+    ]
+  }
+}

@@ -1,7 +1,15 @@
+resource "aws_cloudwatch_log_group" "extract_lambda_log" {
+  name = "/aws/lambda/${aws_lambda_function.extract_raw_data_function.function_name}"
+}
+
+resource "aws_cloudwatch_log_group" "transform_lambda_log" {
+  name = "/aws/lambda/${aws_lambda_function.transform_data_function.function_name}"
+}
+
 resource "aws_cloudwatch_log_metric_filter" "log_extract_major_errors" {
   name           = "extract-major-errors"
   pattern        = "MAJOR_ERROR"
-  log_group_name = "/aws/lambda/${aws_lambda_function.extract_raw_data_function.function_name}"
+  log_group_name = aws_cloudwatch_log_group.extract_lambda_log.name
 
   metric_transformation {
     name      = "extract-major-errors"
@@ -13,7 +21,7 @@ resource "aws_cloudwatch_log_metric_filter" "log_extract_major_errors" {
 resource "aws_cloudwatch_log_metric_filter" "log_transform_major_errors" {
   name           = "transform-major-errors"
   pattern        = "MAJOR_ERROR"
-  log_group_name = "/aws/lambda/${aws_lambda_function.transform_data_function.function_name}"
+  log_group_name = aws_cloudwatch_log_group.transform_lambda_log.name
 
   metric_transformation {
     name      = "transform-major-errors"
