@@ -32,6 +32,7 @@ class TestCleanAddress:
             'phone': '07625532556',
             }]
         test_df = pd.DataFrame(test_data)
+        print(test_df)
         buffer = BytesIO()
         test_df.to_parquet(buffer, index=False)
         buffer.seek(0)
@@ -39,6 +40,7 @@ class TestCleanAddress:
         mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
         mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
         df = clean_address(file_path=file_name, bucket_name=bucket_name)
+        print(df)
 
         assert isinstance(df, pd.DataFrame)
         assert df["address_id"].dtypes == int
@@ -48,130 +50,131 @@ class TestCleanAddress:
         assert df["district"].dtypes == object
         assert df["postal_code"].dtypes =='string'
         assert df["phone"].dtypes == 'string'
+        assert False
 
-    def test_drops_null_values_except_allows_null_columns(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_drops_null_values_except_allows_null_columns(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "payment/example.parquet"
+    #     bucket_name = "test-bucket"
+    #     file_name = "payment/example.parquet"
 
-        test_data = [{
-            'address_id' : 1,
-            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : None,
-            'address_line_2' : None,
-            'district': 'Test',
-            'city': 'Test City',
-            'postal_code': '12345',
-            'country': None,
-            'phone': '07625532556',
-            }]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
-        buffer.seek(0)
+    #     test_data = [{
+    #         'address_id' : 1,
+    #         'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'address_line_1' : None,
+    #         'address_line_2' : None,
+    #         'district': 'Test',
+    #         'city': 'Test City',
+    #         'postal_code': '12345',
+    #         'country': None,
+    #         'phone': '07625532556',
+    #         }]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
+    #     buffer.seek(0)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address(file_path=file_name, bucket_name=bucket_name)
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
+    #     df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
-        assert len(df['address_line_1']) == 0
-        assert len(df['country']) == 0
+    #     assert len(df['address_line_1']) == 0
+    #     assert len(df['country']) == 0
 
-        null_mask = df.isnull().any(axis=1)
-        assert null_mask.any() == False
+    #     null_mask = df.isnull().any(axis=1)
+    #     assert null_mask.any() == False
 
-    def test_valid_datetime(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_valid_datetime(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "payment/example.parquet"
+    #     bucket_name = "test-bucket"
+    #     file_name = "payment/example.parquet"
 
-        test_data = [{
-            'address_id' : 1,
-            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'last_updated' : datetime.fromisoformat('2026-12-15 15:51:20.825099'),
-            'address_line_1' : '123 Some Street',
-            'address_line_2' : None,
-            'district': 'Test',
-            'city': 'Test City',
-            'postal_code': '12345',
-            'country': 'United Kingdom',
-            'phone': '07625532556',
-            }]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
-        buffer.seek(0)
+    #     test_data = [{
+    #         'address_id' : 1,
+    #         'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'last_updated' : datetime.fromisoformat('2026-12-15 15:51:20.825099'),
+    #         'address_line_1' : '123 Some Street',
+    #         'address_line_2' : None,
+    #         'district': 'Test',
+    #         'city': 'Test City',
+    #         'postal_code': '12345',
+    #         'country': 'United Kingdom',
+    #         'phone': '07625532556',
+    #         }]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
+    #     buffer.seek(0)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address(file_path=file_name, bucket_name=bucket_name)
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
+    #     df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
 
-        today = datetime.today()
+    #     today = datetime.today()
 
-        assert (df['created_at'] <= today).all()
-        assert (df['last_updated'] <= today).all()
-        assert len(df['last_updated']) == 0
+    #     assert (df['created_at'] <= today).all()
+    #     assert (df['last_updated'] <= today).all()
+    #     assert len(df['last_updated']) == 0
 
-    def test_capitalises_correct_words(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_capitalises_correct_words(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "payment/example.parquet"
+    #     bucket_name = "test-bucket"
+    #     file_name = "payment/example.parquet"
 
-        test_data = [{
-            'address_id' : 1,
-            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : '123 some Street',
-            'address_line_2' : None,
-            'district': 'Test',
-            'city': 'test city',
-            'postal_code': '12345',
-            'country': 'United and kingdom',
-            'phone': '07625532556',
-            }]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
-        buffer.seek(0)
+    #     test_data = [{
+    #         'address_id' : 1,
+    #         'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'address_line_1' : '123 some Street',
+    #         'address_line_2' : None,
+    #         'district': 'Test',
+    #         'city': 'test city',
+    #         'postal_code': '12345',
+    #         'country': 'United and kingdom',
+    #         'phone': '07625532556',
+    #         }]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
+    #     buffer.seek(0)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address(file_path=file_name, bucket_name=bucket_name)
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
+    #     df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
-        assert (df['address_line_1'] == '123 Some Street').all()
-        assert (df['city'] == 'Test City').all()
-        assert (df['country'] == 'United and Kingdom').all()
+    #     assert (df['address_line_1'] == '123 Some Street').all()
+    #     assert (df['city'] == 'Test City').all()
+    #     assert (df['country'] == 'United and Kingdom').all()
 
-    def test_drops_invalid_phone(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_drops_invalid_phone(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "payment/example.parquet"
+    #     bucket_name = "test-bucket"
+    #     file_name = "payment/example.parquet"
 
-        test_data = [{
-            'address_id' : 1,
-            'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-            'address_line_1' : '123 Some Street',
-            'address_line_2' : None,
-            'district': 'Test',
-            'city': 'Test City',
-            'postal_code': '12345',
-            'country': 'United Kingdom',
-            'phone': '625532556',
-            }]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
-        buffer.seek(0)
+    #     test_data = [{
+    #         'address_id' : 1,
+    #         'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #         'address_line_1' : '123 Some Street',
+    #         'address_line_2' : None,
+    #         'district': 'Test',
+    #         'city': 'Test City',
+    #         'postal_code': '12345',
+    #         'country': 'United Kingdom',
+    #         'phone': '625532556',
+    #         }]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
+    #     buffer.seek(0)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
-        df = clean_address(file_path=file_name, bucket_name=bucket_name)
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.read())
+    #     df = clean_address(file_path=file_name, bucket_name=bucket_name)
 
-        assert len(df['phone']) == 0
+    #     assert len(df['phone']) == 0

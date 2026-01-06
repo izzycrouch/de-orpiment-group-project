@@ -1,6 +1,7 @@
 from clean_layer.star_schema_tables.dim_location import create_dim_location
 import pandas as pd
 from datetime import datetime
+from clean_layer.clean_func.clean_address import clean_address
 
 
 class TestDimLocation:
@@ -67,8 +68,11 @@ class TestDimLocation:
             "last_updated": datetime.fromisoformat("2022-11-03 14:20:49.962000"),
         }]
         cleaned = pd.DataFrame(test_data)
-
+        # print(cleaned)
+        # cleaned = clean_address(cleaned)
+        print(cleaned)
         df = create_dim_location(cleaned)
+        print(df)
 
         assert df["location_id"].dtype == "int64"
         assert df["address_line_1"].dtype == object
@@ -78,3 +82,4 @@ class TestDimLocation:
         assert df["postal_code"].dtype == object
         assert df["country"].dtype == object
         assert df["phone"].dtype == object
+        assert False

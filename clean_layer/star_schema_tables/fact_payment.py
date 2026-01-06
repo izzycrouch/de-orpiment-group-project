@@ -9,7 +9,6 @@ def create_fact_payment(payment, dim_payment_type, dim_transaction, dim_counterp
     )
 
     df.insert(loc=0, column='payment_record_id', value=df.index + 1)
-
     df.insert(loc=2, column='created_date', value=df['created_at'].dt.date)
     df.insert(loc=3, column='created_time', value=df['created_at'].dt.time)
     df.insert(loc=4, column='last_updated_date', value=df['last_updated'].dt.date)

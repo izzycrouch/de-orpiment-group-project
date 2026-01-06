@@ -27,10 +27,11 @@ processed_bucket_name = os.environ["S3_PROCESSED_BUCKET_NAME"]
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG, format='%(asctime)s: %(levelname)s: %(message)s')
+logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s: %(levelname)s: %(message)s')
 
 
 def lambda_handler(event, context):
+    logger.info(f"lambda triggered event:{event}, context:{context}")
 
     # processed_bucket_name = 'test_processed_bucket'
     # raw_bucket_name = 'test_raw_bucket'
@@ -44,11 +45,13 @@ def lambda_handler(event, context):
 
     if not processed_objects['KeyCount']:
         try:
+            logger.info(f"no file found, start init transform")
             raw_objects = s3_client.list_objects_v2(Bucket=raw_bucket_name)
             print(raw_objects)
             tables = list(clean_func_map.keys())
             list_keys = [content['Key'] for content in raw_objects['Contents']]
             for prefix in tables:
+                logger.info(f"Start clean {prefix} table process.")
                 base_df = None
                 for key in list_keys:
                     start_string = prefix + '/year='
@@ -62,8 +65,8 @@ def lambda_handler(event, context):
                 cleaned_df_dict[prefix] = base_df
                 logger.info(f"Finish clean {prefix} table process.")
         except Exception as e:
-            logger.error("MAJOR_ERROR:", str(e))
-            print("ERROR IN LAMBDA:", str(e))
+            logger.error(f"Major error on stage 1: %s", str(e))
+            # print("ERROR IN LAMBDA:", str(e))
             raise
 
 
@@ -83,21 +86,36 @@ def lambda_handler(event, context):
         key = 'dim_date.parquet'
         save_data(dim_date_df,processed_bucket_name,key)
 
+        logger.info("Start design part")
         dim_design_df = dim_design.create_dim_design(cleaned_df_dict['design'])
         key = 'dim_design.parquet'
         save_data(dim_design_df,processed_bucket_name,key)
+        logger.info("Finish design part")
 
-        dim_location_df = dim_location.create_dim_location(cleaned_df_dict['address'])
-        key = 'dim_location.parquet'
-        save_data(dim_location_df,processed_bucket_name,key)
+        try:
+            logger.info("Start location part")
+            logger.info("dataframe head - {}".format(cleaned_df_dict['address'].head()))
+            logger.info(f"{str(cleaned_df_dict['address'])}")
+            dim_location_df = dim_location.create_dim_location(cleaned_df_dict['address'])
+            key = 'dim_location.parquet'
+            save_data(dim_location_df,processed_bucket_name,key)
+        except Exception as e:
+            logger.error(f"Major error on location transform: %s", str(e))
+            # print("ERROR IN LAMBDA:", str(e))
+            raise
 
         dim_payment_type_df = dim_payment_type.create_dim_payment_type(cleaned_df_dict['payment_type'])
         key = 'dim_payment_type.parquet'
         save_data(dim_payment_type_df,processed_bucket_name,key)
 
+        logger.info("Start staff part")
+        logger.info("dataframe staff head - {}".format(cleaned_df_dict['staff'].head()))
+        logger.info(f"{str(cleaned_df_dict['staff'])}")
+
         dim_staff_df = dim_staff.create_dim_staff(cleaned_df_dict['staff'],cleaned_df_dict['department'])
         key = 'dim_staff.parquet'
         save_data(dim_staff_df,processed_bucket_name,key)
+        logger.info("Finish staff part")
 
         cleaned_department_df = cleaned_df_dict['department']
         key = 'cleaned_department_df.parquet'
@@ -233,7 +251,6 @@ def lambda_handler(event, context):
                         new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                         save_data(new_df,processed_bucket_name,key)
         except Exception as e:
-            logger.error("MAJOR_ERROR:", str(e))
-            print("ERROR IN LAMBDA:", str(e))
+            logger.error(f"Major error on stage 2: %s", str(e))
+            # print("ERROR IN LAMBDA:", str(e))
             raise
-
