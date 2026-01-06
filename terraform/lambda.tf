@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "extract_raw_data_function" {
   function_name = "extract-func"
-  role          = aws_iam_role.s3_role.arn
+  role          = aws_iam_role.extract_role.arn
 
   s3_bucket = "lambda-func-code-aci"
   s3_key    = "extract_lambda.zip"
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "extract_raw_data_function" {
     }
   }
 
-  timeout = 200
+  timeout = 900
 }
 
 resource "aws_lambda_layer_version" "libraries_layer" {
@@ -31,7 +31,7 @@ resource "aws_lambda_layer_version" "libraries_layer" {
 
 resource "aws_lambda_function" "transform_data_function" {
   function_name = "transform-func"
-  role          = aws_iam_role.s3_role.arn
+  role          = aws_iam_role.transform_role.arn
 
   s3_bucket = "lambda-func-code-aci"
   s3_key    = "transform_lambda.zip"
@@ -46,10 +46,10 @@ resource "aws_lambda_function" "transform_data_function" {
   environment {
     variables = {
       S3_RAW_BUCKET_NAME       = "totesys-raw-data-aci"
-      S3_PROCESSED_BUCKET_NAME = "totesys-transformed-data-aci-1"
+      S3_PROCESSED_BUCKET_NAME = "totesys-transformed-data-aci-2"
       ENV                      = "prod"
     }
   }
 
-  timeout = 200
+  timeout = 900
 }
