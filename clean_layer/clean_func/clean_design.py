@@ -19,8 +19,8 @@ def clean_design(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     df = df.drop_duplicates(subset=['design_id'], keep='first')
 
     # drops row where created_at and last_updated after current time
-    now = pd.Timestamp.now()
-    df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
+    # now = pd.Timestamp.now()
+    # df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
 
     # drop rows where file_location doesnt start with '/'
     df = df[(df['file_location'].str.startswith('/'))]

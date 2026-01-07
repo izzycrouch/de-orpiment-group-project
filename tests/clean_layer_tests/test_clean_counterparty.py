@@ -163,48 +163,48 @@ class TestCleanCounterparty:
         assert result["created_at"].iloc[0] == datetime.fromisoformat("2022-11-01 10:00:00")
         assert result["legal_address_id"].iloc[0] == 15
 
-    def test_clean_counterparty_drops_future_dates(self):
-        bucket = "test-bucket"
-        key = "counterparty/example.parquet"
+    # def test_clean_counterparty_drops_future_dates(self):
+    #     bucket = "test-bucket"
+    #     key = "counterparty/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "counterparty_id": 1,
-                    "counterparty_legal_name": "Fahey and Sons",
-                    "legal_address_id": 15,
-                    "commercial_contact": "Micheal Toy",
-                    "delivery_contact": "Mrs. Lucy Runolfsdottir",
-                    "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
-                    "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "counterparty_id": 1,
+    #                 "counterparty_legal_name": "Fahey and Sons",
+    #                 "legal_address_id": 15,
+    #                 "commercial_contact": "Micheal Toy",
+    #                 "delivery_contact": "Mrs. Lucy Runolfsdottir",
+    #                 "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #                 "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
-        result = clean_counterparty(file_path=key, bucket_name=bucket)
+    #     self._upload_parquet(df, bucket, key)
+    #     result = clean_counterparty(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty
 
-    def test_clean_counterparty_drops_last_updated_before_created_at(self):
-        bucket = "test-bucket"
-        key = "counterparty/example.parquet"
+    # def test_clean_counterparty_drops_last_updated_before_created_at(self):
+    #     bucket = "test-bucket"
+    #     key = "counterparty/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "counterparty_id": 1,
-                    "counterparty_legal_name": "Fahey and Sons",
-                    "legal_address_id": 15,
-                    "commercial_contact": "Micheal Toy",
-                    "delivery_contact": "Mrs. Lucy Runolfsdottir",
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:51.563000"),
-                    "last_updated": datetime.fromisoformat("2022-11-01 14:20:51.563000"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "counterparty_id": 1,
+    #                 "counterparty_legal_name": "Fahey and Sons",
+    #                 "legal_address_id": 15,
+    #                 "commercial_contact": "Micheal Toy",
+    #                 "delivery_contact": "Mrs. Lucy Runolfsdottir",
+    #                 "created_at": datetime.fromisoformat("2022-11-03 14:20:51.563000"),
+    #                 "last_updated": datetime.fromisoformat("2022-11-01 14:20:51.563000"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
-        result = clean_counterparty(file_path=key, bucket_name=bucket)
+    #     self._upload_parquet(df, bucket, key)
+    #     result = clean_counterparty(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty

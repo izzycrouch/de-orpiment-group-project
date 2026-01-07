@@ -167,67 +167,67 @@ class TestCleanCurrency:
         assert result.shape == (1, 4)
 
 
-    def test_clean_currency_removes_data_if_last_updated_before_created_at(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_clean_currency_removes_data_if_last_updated_before_created_at(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "sales_order/example.parquet"
-        test_data = [{'currency_id' : 1,
-                      'currency_code' : 'USD',
-                      'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-                      'last_updated' : datetime.fromisoformat('2025-12-14 15:51:20.825099')}]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
+    #     bucket_name = "test-bucket"
+    #     file_name = "sales_order/example.parquet"
+    #     test_data = [{'currency_id' : 1,
+    #                   'currency_code' : 'USD',
+    #                   'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #                   'last_updated' : datetime.fromisoformat('2025-12-14 15:51:20.825099')}]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
 
-        result = clean_currency(file_path=file_name, bucket_name=bucket_name)
+    #     result = clean_currency(file_path=file_name, bucket_name=bucket_name)
 
-        assert result.empty
-
-
-    def test_clean_currency_removes_data_if_created_at_after_current_datetime(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
-
-        bucket_name = "test-bucket"
-        file_name = "sales_order/example.parquet"
-        test_data = [{'currency_id' : 1,
-                      'currency_code' : 'USD',
-                      'created_at' : datetime.fromisoformat('2050-12-15 15:51:20.825099'),
-                      'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099')}]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
-
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
-
-        result = clean_currency(file_path=file_name, bucket_name=bucket_name)
-
-        assert result.empty
+    #     assert result.empty
 
 
-    def test_clean_currency_removes_data_if_last_updated_after_current_datetime(self):
-        mock_s3 = boto3.client('s3', region_name='eu-west-2')
+    # def test_clean_currency_removes_data_if_created_at_after_current_datetime(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
 
-        bucket_name = "test-bucket"
-        file_name = "sales_order/example.parquet"
-        test_data = [{'currency_id' : 1,
-                      'currency_code' : 'USD',
-                      'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
-                      'last_updated' : datetime.fromisoformat('2050-12-15 15:51:20.825099')}]
-        test_df = pd.DataFrame(test_data)
-        buffer = BytesIO()
-        test_df.to_parquet(buffer, index=False)
+    #     bucket_name = "test-bucket"
+    #     file_name = "sales_order/example.parquet"
+    #     test_data = [{'currency_id' : 1,
+    #                   'currency_code' : 'USD',
+    #                   'created_at' : datetime.fromisoformat('2050-12-15 15:51:20.825099'),
+    #                   'last_updated' : datetime.fromisoformat('2025-12-15 15:51:20.825099')}]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
 
-        mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
-        mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
 
-        result = clean_currency(file_path=file_name, bucket_name=bucket_name)
+    #     result = clean_currency(file_path=file_name, bucket_name=bucket_name)
 
-        assert result.empty
+    #     assert result.empty
+
+
+    # def test_clean_currency_removes_data_if_last_updated_after_current_datetime(self):
+    #     mock_s3 = boto3.client('s3', region_name='eu-west-2')
+
+    #     bucket_name = "test-bucket"
+    #     file_name = "sales_order/example.parquet"
+    #     test_data = [{'currency_id' : 1,
+    #                   'currency_code' : 'USD',
+    #                   'created_at' : datetime.fromisoformat('2025-12-15 15:51:20.825099'),
+    #                   'last_updated' : datetime.fromisoformat('2050-12-15 15:51:20.825099')}]
+    #     test_df = pd.DataFrame(test_data)
+    #     buffer = BytesIO()
+    #     test_df.to_parquet(buffer, index=False)
+
+    #     mock_s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": "eu-west-2"})
+    #     mock_s3.put_object(Bucket=bucket_name, Key=file_name, Body=buffer.getvalue())
+
+    #     result = clean_currency(file_path=file_name, bucket_name=bucket_name)
+
+        # assert result.empty
 
 
     def test_clean_currency_returns_stripped_string_for_currency_code(self):

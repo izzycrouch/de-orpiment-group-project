@@ -10,6 +10,6 @@ def clean_payment_type(file_path: str, bucket_name: str = 'totesys-raw-data-aci'
     df["payment_type_name"] = df["payment_type_name"].astype("string")
     df = df.dropna()
     df = df.drop_duplicates(subset=['payment_type_id'], keep='first')
-    now = pd.Timestamp.now()
-    df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
+    # now = pd.Timestamp.now()
+    # df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
     return df

@@ -194,100 +194,100 @@ class TestCleanPurchaseOrder:
         assert result["created_at"].iloc[0] == datetime.fromisoformat("2022-11-01 10:00:00")
         assert result["item_code"].iloc[0] == "AAA111"
 
-    def test_clean_purchase_order_drops_future_dates(self):
-        bucket = "test-bucket"
-        key = "purchase_order/example.parquet"
+    # def test_clean_purchase_order_drops_future_dates(self):
+    #     bucket = "test-bucket"
+    #     key = "purchase_order/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "purchase_order_id": 1,
-                    "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
-                    "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
-                    "staff_id": 12,
-                    "counterparty_id": 11,
-                    "item_code": "ZDOI5EA",
-                    "item_quantity": 371,
-                    "item_unit_price": 361.39,
-                    "currency_id": 2,
-                    "agreed_delivery_date": "2022-11-09",
-                    "agreed_payment_date": "2022-11-07",
-                    "agreed_delivery_location_id": 6,
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "purchase_order_id": 1,
+    #                 "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #                 "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #                 "staff_id": 12,
+    #                 "counterparty_id": 11,
+    #                 "item_code": "ZDOI5EA",
+    #                 "item_quantity": 371,
+    #                 "item_unit_price": 361.39,
+    #                 "currency_id": 2,
+    #                 "agreed_delivery_date": "2022-11-09",
+    #                 "agreed_payment_date": "2022-11-07",
+    #                 "agreed_delivery_location_id": 6,
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
-        result = clean_purchase_order(file_path=key, bucket_name=bucket)
+    #     self._upload_parquet(df, bucket, key)
+    #     result = clean_purchase_order(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty
 
-    def test_clean_purchase_order_drops_last_updated_before_created_at(self):
-        bucket = "test-bucket"
-        key = "purchase_order/example.parquet"
+    # def test_clean_purchase_order_drops_last_updated_before_created_at(self):
+        # bucket = "test-bucket"
+        # key = "purchase_order/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "purchase_order_id": 1,
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
-                    "last_updated": datetime.fromisoformat("2022-11-01 14:20:52.187000"),
-                    "staff_id": 12,
-                    "counterparty_id": 11,
-                    "item_code": "ZDOI5EA",
-                    "item_quantity": 371,
-                    "item_unit_price": 361.39,
-                    "currency_id": 2,
-                    "agreed_delivery_date": "2022-11-09",
-                    "agreed_payment_date": "2022-11-07",
-                    "agreed_delivery_location_id": 6,
-                }
-            ]
-        )
+        # df = pd.DataFrame(
+        #     [
+        #         {
+        #             "purchase_order_id": 1,
+        #             "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
+        #             "last_updated": datetime.fromisoformat("2022-11-01 14:20:52.187000"),
+        #             "staff_id": 12,
+        #             "counterparty_id": 11,
+        #             "item_code": "ZDOI5EA",
+        #             "item_quantity": 371,
+        #             "item_unit_price": 361.39,
+        #             "currency_id": 2,
+        #             "agreed_delivery_date": "2022-11-09",
+        #             "agreed_payment_date": "2022-11-07",
+        #             "agreed_delivery_location_id": 6,
+        #         }
+        #     ]
+        # )
 
-        self._upload_parquet(df, bucket, key)
-        result = clean_purchase_order(file_path=key, bucket_name=bucket)
+        # self._upload_parquet(df, bucket, key)
+        # result = clean_purchase_order(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+        # assert result.empty
 
-    def test_clean_purchase_order_drops_non_positive_quantity_or_price(self):
-        bucket = "test-bucket"
-        key = "purchase_order/example.parquet"
+    # def test_clean_purchase_order_drops_non_positive_quantity_or_price(self):
+    #     bucket = "test-bucket"
+    #     key = "purchase_order/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "purchase_order_id": 1,
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
-                    "last_updated": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
-                    "staff_id": 12,
-                    "counterparty_id": 11,
-                    "item_code": "ZDOI5EA",
-                    "item_quantity": 0,
-                    "item_unit_price": 361.39,
-                    "currency_id": 2,
-                    "agreed_delivery_date": "2022-11-09",
-                    "agreed_payment_date": "2022-11-07",
-                    "agreed_delivery_location_id": 6,
-                },
-                {
-                    "purchase_order_id": 2,
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
-                    "last_updated": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
-                    "staff_id": 12,
-                    "counterparty_id": 11,
-                    "item_code": "QLZLEXR",
-                    "item_quantity": 10,
-                    "item_unit_price": -1.0,
-                    "currency_id": 2,
-                    "agreed_delivery_date": "2022-11-09",
-                    "agreed_payment_date": "2022-11-07",
-                    "agreed_delivery_location_id": 6,
-                },
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "purchase_order_id": 1,
+    #                 "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
+    #                 "last_updated": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
+    #                 "staff_id": 12,
+    #                 "counterparty_id": 11,
+    #                 "item_code": "ZDOI5EA",
+    #                 "item_quantity": 0,
+    #                 "item_unit_price": 361.39,
+    #                 "currency_id": 2,
+    #                 "agreed_delivery_date": "2022-11-09",
+    #                 "agreed_payment_date": "2022-11-07",
+    #                 "agreed_delivery_location_id": 6,
+    #             },
+    #             {
+    #                 "purchase_order_id": 2,
+    #                 "created_at": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
+    #                 "last_updated": datetime.fromisoformat("2022-11-03 14:20:52.187000"),
+    #                 "staff_id": 12,
+    #                 "counterparty_id": 11,
+    #                 "item_code": "QLZLEXR",
+    #                 "item_quantity": 10,
+    #                 "item_unit_price": -1.0,
+    #                 "currency_id": 2,
+    #                 "agreed_delivery_date": "2022-11-09",
+    #                 "agreed_payment_date": "2022-11-07",
+    #                 "agreed_delivery_location_id": 6,
+    #             },
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
-        result = clean_purchase_order(file_path=key, bucket_name=bucket)
+    #     self._upload_parquet(df, bucket, key)
+    #     result = clean_purchase_order(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty

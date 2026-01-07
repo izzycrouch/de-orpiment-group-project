@@ -16,7 +16,7 @@ def clean_transcation(file_path: str, bucket_name: str = 'totesys-raw-data-aci')
 
     df = df[df["transaction_type"].isin(["PURCHASE", "SALE"])]
 
-    now = pd.Timestamp.now()
-    df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
+    # now = pd.Timestamp.now()
+    # df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
 
     return df

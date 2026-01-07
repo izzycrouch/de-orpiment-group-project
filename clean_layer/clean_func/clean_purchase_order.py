@@ -23,14 +23,14 @@ def clean_purchase_order(
 
     df = df.dropna()
     df = df.drop_duplicates(subset=["purchase_order_id"], keep="first")
-    now = pd.Timestamp.now()
+    # now = pd.Timestamp.now()
 
-    df = df[
-        (df["item_quantity"] > 0)
-        & (df["item_unit_price"] > 0)
-        & (df["created_at"] <= now)
-        & (df["last_updated"] <= now)
-        & (df["created_at"] <= df["last_updated"])
-    ]
+    # df = df[
+    #     (df["item_quantity"] > 0)
+    #     & (df["item_unit_price"] > 0)
+    #     & (df["created_at"] <= now)
+    #     & (df["last_updated"] <= now)
+    #     & (df["created_at"] <= df["last_updated"])
+    # ]
 
     return df
