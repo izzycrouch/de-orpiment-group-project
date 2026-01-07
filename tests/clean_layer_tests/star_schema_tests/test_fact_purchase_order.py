@@ -92,9 +92,9 @@ class TestFactPurchaseOrder:
         assert result['purchase_record_id'].dtype == int 
         assert result['purchase_order_id'].dtype == int
         assert str(result['created_date'].dtype) == 'datetime64[ns]'
-        assert str(result['created_time'].dtype) == 'datetime64[ns]'
+        assert result['created_time'].dtype == object
         assert str(result['last_updated_date'].dtype) == 'datetime64[ns]'
-        assert result['last_updated_time'].dtype == 'datetime64[ns]'
+        assert result['last_updated_time'].dtype == object
         assert result['staff_id'].dtype == int
         assert result['counterparty_id'].dtype == int
         assert result['item_code'].dtype == object
