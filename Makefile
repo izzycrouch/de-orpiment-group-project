@@ -54,7 +54,7 @@ run-pytest: unit-test
 # Run bash scripts
 create-bucket:
 	chmod +x create_bucket.sh
-	.\create_bucket.sh
+	./create_bucket.sh
 zip-layer:
 	chmod +x upload_layer_func.sh
 	./upload_layer_func.sh
