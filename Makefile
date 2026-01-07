@@ -49,7 +49,7 @@ test-db:
 	.\test_db_script.sh
 unit-test:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
-run-pytest: test-db unit-test
+run-pytest: unit-test
 
 # Run bash scripts
 create-bucket:
