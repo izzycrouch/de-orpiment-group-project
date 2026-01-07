@@ -24,16 +24,6 @@ jobs:
       - name: pytest
         run: make run-pytest
 
-  run-bash-script:
-    name: run-bash-script
-    runs-on: ubuntu-latest
-    needs: run-tests
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v5
-
-      - name: run bash script
-        run: make run-script
 
   deploy-terraform:
     env:
@@ -42,7 +32,7 @@ jobs:
       
     name: deploy-terraform
     runs-on: ubuntu-latest
-    needs: run-bash-script
+    needs: run-tests
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
@@ -53,6 +43,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
+
+      - name: run bash script
+        run: make run-script
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
