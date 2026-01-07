@@ -20,6 +20,7 @@ def lambda_handler(event, content):
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     db = None
     try:
+        content_list = {}
         logger.info("Start extract")
         ENV = os.getenv("ENV", "dev")
         if ENV == "dev":
@@ -33,7 +34,7 @@ def lambda_handler(event, content):
         old_json = get_latest_extraction_info(BUCKET_NAME)
         if not old_json:
             old_json = build_inital_json(tables)
-        new_json = {}
+        new_json = []
         for table in tables:
             logger.info(f"Start extract {table}")
             file_name = table +  prefix + 'batch_' + timestamp +'.parquet'
@@ -52,6 +53,7 @@ def lambda_handler(event, content):
                 df.to_parquet(buffer, index=False)
                 buffer.seek(0)
                 save_data(buffer.getvalue(), BUCKET_NAME, file_name)
+                content_list.append(file_name)
                 #for csv:
                 # df.to_csv(buffer, index=False)
                 # buffer.seek(0)
@@ -65,6 +67,7 @@ def lambda_handler(event, content):
 
         save_new_extraction_info(new_json,BUCKET_NAME)
         logger.info(f"Finish extract")
+        return content_list
     except Exception as e:
         logger.error(f"MAJOR_ERROR: Ingestion failed: %s", str(e))
         raise
