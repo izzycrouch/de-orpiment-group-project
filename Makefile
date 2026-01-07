@@ -44,9 +44,9 @@ check-coverage:
 all: create-environment requirements dev-setup security-test check-coverage
 
 # Run script for pytest
-test-db:
-	chmod +x test_db_script.sh
-	.\test_db_script.sh
+# test-db:
+# 	chmod +x test_db_script.sh
+# 	.\test_db_script.sh
 unit-test:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
 run-pytest: unit-test
