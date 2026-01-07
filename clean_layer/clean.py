@@ -165,7 +165,7 @@ def lambda_handler(event, context):
 
             # new_files = [key for key in list_keys if event in key]
 
-            # tables = list(clean_func_map.keys())
+            tables = list(clean_func_map.keys())
 
             def update_dim(df,processed_bucket_name,create_func,key):
                 dim_df =  get_df (processed_bucket_name,key)
