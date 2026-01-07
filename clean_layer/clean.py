@@ -164,7 +164,7 @@ def lambda_handler(event, context):
             # list_keys = [content['Key'] for content in raw_objects['Contents']]
 
             # new_files = [key for key in list_keys if event in key]
-
+            logger.info("Start update!")
             tables = list(clean_func_map.keys())
 
             def update_dim(df,processed_bucket_name,create_func,key):
@@ -185,7 +185,9 @@ def lambda_handler(event, context):
                 start_string = prefix + '/year='
                 for key in event:
                     if key.startswith(start_string):
+                        logger.info(f"Start clean {key}!")
                         df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+                        logger.info(f"Finish clean {key}!")
                         if prefix in list(dim_func_map.keys()):
                             update_dim(df,processed_bucket_name,dim_func_map[prefix][0],dim_func_map[prefix][1])
 
@@ -247,20 +249,21 @@ def lambda_handler(event, context):
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
 
-                    elif prefix == 'payment':
-                        dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
-                        dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
-                        dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
-                        dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
-                        dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
-                        dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
-                        dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
-                        dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
-                        key = 'fact_payment.parquet'
-                        dim_df =  get_df(processed_bucket_name,key)
-                        df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
-                        new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
-                        save_data(new_df,processed_bucket_name,key)
+                        elif prefix == 'payment':
+                            dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+                            dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+                            dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+                            dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+                            dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+                            dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+                            dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+                            dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+                            key = 'fact_payment.parquet'
+                            dim_df =  get_df(processed_bucket_name,key)
+                            df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
+                            new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+                            save_data(new_df,processed_bucket_name,key)
+                        logger.info(f"Finish update {key}!")
         except Exception as e:
             logger.error("MAJOR_ERROR:", str(e))
             print("ERROR IN LAMBDA:", str(e))
