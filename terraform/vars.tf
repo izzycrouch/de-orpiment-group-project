@@ -3,14 +3,8 @@ variable "python_runtime" {
   default = "python3.12"
 }
 
-variable "postgres_identifier" {}
+variable "db_username" {}
 
-variable "postgres_user_name" {}
-
-variable "postgres_user_password" {}
-
-variable "postgres_instance_name" {}
-
-variable "postgres_db_password" {}
-
-variable "postgres_port" {}
+variable "db_password" {
+  sensitive = true
+}
