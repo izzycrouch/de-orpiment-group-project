@@ -9,3 +9,4 @@ venv
 **.zip
 **python
 zip_lambda_func
+.coverage
