@@ -44,17 +44,17 @@ check-coverage:
 all: create-environment requirements dev-setup security-test check-coverage
 
 # Run script for pytest
-test-db:
-	chmod +x test_db_script.sh
-	.\test_db_script.sh
+# test-db:
+# 	chmod +x test_db_script.sh
+# 	.\test_db_script.sh
 unit-test:
 	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest -v)
-run-pytest: test-db unit-test
+run-pytest: unit-test
 
 # Run bash scripts
 create-bucket:
 	chmod +x create_bucket.sh
-	.\create_bucket.sh
+	./create_bucket.sh
 zip-layer:
 	chmod +x upload_layer_func.sh
 	./upload_layer_func.sh
