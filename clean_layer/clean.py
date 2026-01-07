@@ -55,17 +55,15 @@ def lambda_handler(event, context):
                 logger.info(f"Start clean {prefix} table process.")
                 base_df = None
                 for key in list_keys:
-                    # start_string = prefix + '/year='
-                    # if key.startswith(start_string):
-                    #     print(key)
-                    #     print(raw_bucket_name)
-                    df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+                    start_string = prefix + '/year='
+                    if key.startswith(start_string):
 
-                    if not isinstance(base_df, pd.DataFrame):
-                        base_df =df
-                    else:
-                        base_df = pd.concat([base_df,df], axis=0, ignore_index=True)
-                # print(f"{prefix}:{base_df}")
+                        df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+                        if not isinstance(base_df, pd.DataFrame):
+                            base_df =df
+                        else:
+                            base_df = pd.concat([base_df,df], axis=0, ignore_index=True)
+                
                 cleaned_df_dict[prefix] = base_df
                 logger.info(f"Finish clean {prefix} table process.")
         except Exception as e:
