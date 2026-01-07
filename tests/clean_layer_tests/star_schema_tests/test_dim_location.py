@@ -82,4 +82,4 @@ class TestDimLocation:
         assert df["postal_code"].dtype == object
         assert df["country"].dtype == object
         assert df["phone"].dtype == object
-        assert False
+
