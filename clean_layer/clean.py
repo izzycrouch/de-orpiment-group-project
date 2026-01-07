@@ -1,3 +1,4 @@
+
 import logging
 import boto3
 from clean_layer.clean_func import clean_address,clean_counterparty,clean_currency,clean_department,clean_design,clean_payment,clean_payment_type,clean_purchase_order,clean_sales_order,clean_staff,clean_transcation
@@ -46,22 +47,25 @@ def lambda_handler(event, context):
     if not processed_objects['KeyCount']:
         try:
             logger.info(f"no file found, start init transform")
-            raw_objects = s3_client.list_objects_v2(Bucket=raw_bucket_name)
-            print(raw_objects)
             tables = list(clean_func_map.keys())
-            list_keys = [content['Key'] for content in raw_objects['Contents']]
             for prefix in tables:
+                start_string = prefix + '/year='
+                raw_objects = s3_client.list_objects_v2(Bucket=raw_bucket_name,Prefix = start_string)
+                list_keys = [content['Key'] for content in raw_objects['Contents']]
                 logger.info(f"Start clean {prefix} table process.")
                 base_df = None
                 for key in list_keys:
-                    start_string = prefix + '/year='
-                    if key.startswith(start_string):
+                    # start_string = prefix + '/year='
+                    # if key.startswith(start_string):
+                    #     print(key)
+                    #     print(raw_bucket_name)
+                    df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
 
-                        df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
-                        if not isinstance(base_df, pd.DataFrame):
-                            base_df =df
-                        else:
-                            base_df = pd.concat([base_df,df], axis=0, ignore_index=True)
+                    if not isinstance(base_df, pd.DataFrame):
+                        base_df =df
+                    else:
+                        base_df = pd.concat([base_df,df], axis=0, ignore_index=True)
+                # print(f"{prefix}:{base_df}")
                 cleaned_df_dict[prefix] = base_df
                 logger.info(f"Finish clean {prefix} table process.")
         except Exception as e:
@@ -70,7 +74,7 @@ def lambda_handler(event, context):
             raise
 
 
-
+        print(cleaned_df_dict['staff'])
 
         logger.info("Start counterparty ingest")
         dim_counterparty_df = dim_counterparty.create_dim_counterparty(address_df=cleaned_df_dict['address'],counterparty_df=cleaned_df_dict['counterparty'])
@@ -109,8 +113,8 @@ def lambda_handler(event, context):
         save_data(dim_payment_type_df,processed_bucket_name,key)
 
         logger.info("Start staff part")
-        logger.info("dataframe staff head - {}".format(cleaned_df_dict['staff'].head()))
         logger.info(f"{str(cleaned_df_dict['staff'])}")
+        # logger.info("dataframe staff head - {}".format(cleaned_df_dict['staff'].head()))
 
         dim_staff_df = dim_staff.create_dim_staff(cleaned_df_dict['staff'],cleaned_df_dict['department'])
         key = 'dim_staff.parquet'
@@ -120,6 +124,11 @@ def lambda_handler(event, context):
         cleaned_department_df = cleaned_df_dict['department']
         key = 'cleaned_department_df.parquet'
         save_data(cleaned_department_df,processed_bucket_name,key)
+
+
+        logger.info("Transaction part")
+        logger.info("dataframe transaction head - {}".format(cleaned_df_dict['transaction'].head()))
+        logger.info(f"{str(cleaned_df_dict['transaction'])}")
 
         dim_transaction_df = dim_transaction.create_dim_transaction(cleaned_df_dict['transaction'])
         key = 'dim_transaction.parquet'
@@ -151,106 +160,106 @@ def lambda_handler(event, context):
         save_data(fact_sales_order_df,processed_bucket_name,key)
         logger.info("Initial build done!")
 
-    else:
-        try:
-            key = event['Records'][0]['s3']['object']['key']
-            tables = list(clean_func_map.keys())
+    # else:
+    #     try:
+    #         key = event['Records'][0]['s3']['object']['key']
+    #         tables = list(clean_func_map.keys())
 
-            def update_dim(df,processed_bucket_name,create_func,key):
-                dim_df =  get_df(processed_bucket_name,key)
-                df = create_func(df)
-                new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
-                save_data(new_df,processed_bucket_name,key)
+    #         def update_dim(df,processed_bucket_name,create_func,key):
+    #             dim_df =  get_df(processed_bucket_name,key)
+    #             df = create_func(df)
+    #             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+    #             save_data(new_df,processed_bucket_name,key)
 
 
 
-            dim_func_map = {
-                        'address': [dim_location.create_dim_location,'dim_location.parquet'],
-                        'payment_type': [dim_payment_type.create_dim_payment_type,'dim_payment_type.parquet'],
-                        'transaction': [dim_transaction.create_dim_transaction,'dim_transaction.parquet'],
-                        'design': [dim_design.create_dim_design,'dim_design.parquet'],
-                        'currency':[dim_currency.create_dim_currency,'dim_currency.parquet']}
+    #         dim_func_map = {
+    #                     'address': [dim_location.create_dim_location,'dim_location.parquet'],
+    #                     'payment_type': [dim_payment_type.create_dim_payment_type,'dim_payment_type.parquet'],
+    #                     'transaction': [dim_transaction.create_dim_transaction,'dim_transaction.parquet'],
+    #                     'design': [dim_design.create_dim_design,'dim_design.parquet'],
+    #                     'currency':[dim_currency.create_dim_currency,'dim_currency.parquet']}
 
-            for prefix in tables:
-                start_string = prefix + '/year='
-                if key.startswith(start_string):
-                    df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
-                    if prefix in list(dim_func_map.keys()):
-                        update_dim(df,processed_bucket_name,dim_func_map[prefix][0],dim_func_map[prefix][1])
+    #         for prefix in tables:
+    #             start_string = prefix + '/year='
+    #             if key.startswith(start_string):
+    #                 df = clean_func_map[prefix](file_path = key,bucket_name = raw_bucket_name)
+    #                 if prefix in list(dim_func_map.keys()):
+    #                     update_dim(df,processed_bucket_name,dim_func_map[prefix][0],dim_func_map[prefix][1])
 
-                    elif prefix=='counterparty':
-                        dim_counterparty.update_counterparty(df,processed_bucket_name)
+    #                 elif prefix=='counterparty':
+    #                     dim_counterparty.update_counterparty(df,processed_bucket_name)
 
-                    elif prefix == 'staff':
-                        dim_staff.update_dim_staff(df,processed_bucket_name)
+    #                 elif prefix == 'staff':
+    #                     dim_staff.update_dim_staff(df,processed_bucket_name)
 
-                    elif prefix == 'department':
-                        dim_staff.update_dim_staff(df,processed_bucket_name)
+    #                 elif prefix == 'department':
+    #                     dim_staff.update_dim_staff(df,processed_bucket_name)
 
-    #fact table
-                    elif prefix == 'sales_order':
-                        #get all the dim table use get_df
-                        #get old fact use get_df
-                        #using the dim tables to make
-                        # using fact_sales_order.create_fact_sales_order generate new table
-                        # pd.concat([dim_df,df],axis=0, ignore_index=True)
-                        dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
-                        dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
-                        dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
-                        dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
-                        dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
-                        dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
-                        dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
-                        dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
-                        key = 'fact_sales_order.parquet'
-                        dim_df =  get_df(processed_bucket_name,key)
-                        df = fact_sales_order.create_fact_sales_order(
-                                    sales_order = df,
-                                    dim_date_df = dim_date_df,
-                                    dim_staff = dim_staff_df,
-                                    dim_counterparty = dim_counterparty_df,
-                                    dim_currency = dim_currency_df,
-                                    dim_design = dim_design_df,
-                                    dim_location = dim_location_df )
-                        new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
-                        save_data(new_df,processed_bucket_name,key)
+    # #fact table
+    #                 elif prefix == 'sales_order':
+    #                     #get all the dim table use get_df
+    #                     #get old fact use get_df
+    #                     #using the dim tables to make
+    #                     # using fact_sales_order.create_fact_sales_order generate new table
+    #                     # pd.concat([dim_df,df],axis=0, ignore_index=True)
+    #                     dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+    #                     dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+    #                     dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+    #                     dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+    #                     dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+    #                     dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+    #                     dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+    #                     dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+    #                     key = 'fact_sales_order.parquet'
+    #                     dim_df =  get_df(processed_bucket_name,key)
+    #                     df = fact_sales_order.create_fact_sales_order(
+    #                                 sales_order = df,
+    #                                 dim_date_df = dim_date_df,
+    #                                 dim_staff = dim_staff_df,
+    #                                 dim_counterparty = dim_counterparty_df,
+    #                                 dim_currency = dim_currency_df,
+    #                                 dim_design = dim_design_df,
+    #                                 dim_location = dim_location_df )
+    #                     new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+    #                     save_data(new_df,processed_bucket_name,key)
 
-                    elif prefix == 'purchase_order':
-                        dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
-                        dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
-                        dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
-                        dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
-                        dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
-                        dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
-                        dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
-                        dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
-                        key = 'fact_purchase_order.parquet'
-                        dim_df =  get_df(processed_bucket_name,key)
-                        df = fact_purchase_order.create_fact_purchase_order(dim_date_df = dim_date_df,
-                                dim_currency_df = dim_currency_df,
-                                dim_staff_df = dim_staff_df,
-                                dim_counterparty_df = dim_counterparty_df,
-                                dim_location_df = dim_location_df ,
-                                purchase_order_df = cleaned_df_dict['purchase_order'])
+    #                 elif prefix == 'purchase_order':
+    #                     dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+    #                     dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+    #                     dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+    #                     dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+    #                     dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+    #                     dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+    #                     dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+    #                     dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+    #                     key = 'fact_purchase_order.parquet'
+    #                     dim_df =  get_df(processed_bucket_name,key)
+    #                     df = fact_purchase_order.create_fact_purchase_order(dim_date_df = dim_date_df,
+    #                             dim_currency_df = dim_currency_df,
+    #                             dim_staff_df = dim_staff_df,
+    #                             dim_counterparty_df = dim_counterparty_df,
+    #                             dim_location_df = dim_location_df ,
+    #                             purchase_order_df = cleaned_df_dict['purchase_order'])
 
-                        new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
-                        save_data(new_df,processed_bucket_name,key)
+    #                     new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+    #                     save_data(new_df,processed_bucket_name,key)
 
-                    elif prefix == 'payment':
-                        dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
-                        dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
-                        dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
-                        dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
-                        dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
-                        dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
-                        dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
-                        dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
-                        key = 'fact_payment.parquet'
-                        dim_df =  get_df(processed_bucket_name,key)
-                        df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
-                        new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
-                        save_data(new_df,processed_bucket_name,key)
-        except Exception as e:
-            logger.error(f"Major error on stage 2: %s", str(e))
-            # print("ERROR IN LAMBDA:", str(e))
-            raise
+    #                 elif prefix == 'payment':
+    #                     dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
+    #                     dim_currency_df = get_df(processed_bucket_name,'dim_currency.parquet')
+    #                     dim_date_df = get_df(processed_bucket_name,'dim_date.parquet')
+    #                     dim_design_df = get_df(processed_bucket_name,'dim_design.parquet')
+    #                     dim_location_df = get_df(processed_bucket_name,'dim_location.parquet')
+    #                     dim_payment_type_df = get_df(processed_bucket_name,'dim_payment_type.parquet')
+    #                     dim_staff_df = get_df(processed_bucket_name,'dim_staff.parquet')
+    #                     dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
+    #                     key = 'fact_payment.parquet'
+    #                     dim_df =  get_df(processed_bucket_name,key)
+    #                     df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
+    #                     new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
+    #                     save_data(new_df,processed_bucket_name,key)
+    #     except Exception as e:
+    #         logger.error(f"Major error on stage 2: %s", str(e))
+    #         # print("ERROR IN LAMBDA:", str(e))
+    #         raise

@@ -15,6 +15,8 @@ def create_fact_payment(payment, dim_payment_type, dim_transaction, dim_counterp
     df.insert(loc=5, column='last_updated_time', value=df['last_updated'].dt.time)
 
     df = (df.merge(dim_date, left_on='created_date', right_on='date_id', how='left'))
+    df = (df.merge(dim_date, left_on='last_updated_date', right_on='date_id', how='left'))
+
 
     fact_payment = (
         df[
