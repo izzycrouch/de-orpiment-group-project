@@ -20,11 +20,13 @@ def lambda_handler(event, content):
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     db = None
     try:
+        logger.info("Start extract")
         ENV = os.getenv("ENV", "dev")
         if ENV == "dev":
             db = connect_to_local_db()
         elif ENV == "prod":
             db = connect_to_db()
+        logger.info(f"Switch env to {ENV}")
 
         tables = ['counterparty', 'address', 'department', 'purchase_order', 'staff', 'payment_type', 'payment', 'transaction', 'design', 'sales_order', 'currency']
 
@@ -33,6 +35,7 @@ def lambda_handler(event, content):
             old_json = build_inital_json(tables)
         new_json = {}
         for table in tables:
+            logger.info(f"Start extract {table}")
             file_name = table +  prefix + 'batch_' + timestamp +'.parquet'
             latest_timestamp = old_json[table]
             rows =  db.run(f"""
@@ -58,11 +61,12 @@ def lambda_handler(event, content):
 
             new_json[table] = latest_timestamp
 
-        save_new_extraction_info(new_json,BUCKET_NAME)
+            logger.info(f"Finish extract {table}")
 
+        save_new_extraction_info(new_json,BUCKET_NAME)
+        logger.info(f"Finish extract")
     except Exception as e:
-        logger.error("MAJOR_ERROR: Ingestion failed", e)
-        print("ERROR IN LAMBDA:", e)
+        logger.error(f"MAJOR_ERROR: Ingestion failed: %s", str(e))
         raise
     finally:
         if db:

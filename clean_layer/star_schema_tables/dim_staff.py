@@ -4,6 +4,9 @@ from clean_layer.utils.save_df_into_parquet import save_data
 
 
 def create_dim_staff(cleaned_staff, cleaned_department):
+    cleaned_department = cleaned_department.copy()
+    cleaned_staff = cleaned_staff.copy()
+
     dim_staff = (
         cleaned_staff.merge(cleaned_department, on='department_id', how='inner')
         [

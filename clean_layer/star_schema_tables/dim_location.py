@@ -1,4 +1,5 @@
 def create_dim_location(cleaned_location):
+
     dim_location = (
         cleaned_location[
             [
@@ -13,5 +14,7 @@ def create_dim_location(cleaned_location):
             ]
         ]
     )
+
     dim_location.rename(columns={"address_id": "location_id"}, inplace=True)
+
     return dim_location
