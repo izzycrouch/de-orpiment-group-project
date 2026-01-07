@@ -244,7 +244,7 @@ def lambda_handler(event, context):
                                     dim_staff_df = dim_staff_df,
                                     dim_counterparty_df = dim_counterparty_df,
                                     dim_location_df = dim_location_df ,
-                                    purchase_order_df = cleaned_df_dict['purchase_order'])
+                                    purchase_order_df = df)
 
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
@@ -260,13 +260,12 @@ def lambda_handler(event, context):
                             dim_transaction_df = get_df(processed_bucket_name,'dim_transaction.parquet')
                             key = 'fact_payment.parquet'
                             dim_df =  get_df(processed_bucket_name,key)
-                            df = fact_payment.create_fact_payment(payment = cleaned_df_dict['payment'], dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
+                            df = fact_payment.create_fact_payment(payment = df, dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
                         logger.info(f"Finish update {key}!")
         except Exception as e:
-            logger.error("MAJOR_ERROR:", str(e))
-            print("ERROR IN LAMBDA:", str(e))
+            logger.error(f"MAJOR_ERROR:%s", str(e))
             raise
 
     # else:
