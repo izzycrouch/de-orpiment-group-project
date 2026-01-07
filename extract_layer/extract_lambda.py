@@ -54,6 +54,7 @@ def lambda_handler(event, content):
                 buffer.seek(0)
                 save_data(buffer.getvalue(), BUCKET_NAME, file_name)
                 content_list.append(file_name)
+                logger.info(f"Make {file_name}")
                 #for csv:
                 # df.to_csv(buffer, index=False)
                 # buffer.seek(0)
@@ -67,6 +68,7 @@ def lambda_handler(event, content):
 
         save_new_extraction_info(new_json,BUCKET_NAME)
         logger.info(f"Finish extract")
+        logger.info(f"Content list: {content_list}")
         return content_list
     except Exception as e:
         logger.error(f"MAJOR_ERROR: Ingestion failed: %s", str(e))
