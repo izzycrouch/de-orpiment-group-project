@@ -21,8 +21,8 @@ def clean_sales_order(file_path: str, bucket_name: str = 'totesys-raw-data-aci')
 
     df = df.drop_duplicates(subset=['sales_order_id'], keep='first')
 
-    now = pd.Timestamp.now()
-    df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
-    df = df[(df['created_at'] <= df['agreed_delivery_date']) & (df['created_at'] <= df['agreed_payment_date'])]
+    # now = pd.Timestamp.now()
+    # df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
+    # df = df[(df['created_at'] <= df['agreed_delivery_date']) & (df['created_at'] <= df['agreed_payment_date'])]
 
     return df

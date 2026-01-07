@@ -25,11 +25,11 @@ def clean_counterparty(
     df = df.dropna()
     df = df.drop_duplicates(subset=["counterparty_id"], keep="first")
 
-    now = pd.Timestamp.now()
-    df = df[
-        (df["created_at"] <= now)
-        & (df["last_updated"] <= now)
-        & (df["created_at"] <= df["last_updated"])
-    ]
+    # now = pd.Timestamp.now()
+    # df = df[
+    #     (df["created_at"] <= now)
+    #     & (df["last_updated"] <= now)
+    #     & (df["created_at"] <= df["last_updated"])
+    # ]
 
     return df

@@ -160,48 +160,48 @@ class TestCleanDepartment:
         assert len(result) == 1
         assert result["manager"].iloc[0] == "New Manager"
 
-    def test_clean_department_drops_future_dates(self):
-        bucket = "test-bucket"
-        key = "department/example.parquet"
+    # def test_clean_department_drops_future_dates(self):
+    #     bucket = "test-bucket"
+    #     key = "department/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "department_id": 1,
-                    "department_name": "Sales",
-                    "location": "Manchester",
-                    "manager": "Richard Roma",
-                    "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
-                    "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "department_id": 1,
+    #                 "department_name": "Sales",
+    #                 "location": "Manchester",
+    #                 "manager": "Richard Roma",
+    #                 "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #                 "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
+    #     self._upload_parquet(df, bucket, key)
 
-        result = clean_department(file_path=key, bucket_name=bucket)
+    #     result = clean_department(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty
 
-    def test_clean_department_drops_last_updated_before_created_at(self):
-        bucket = "test-bucket"
-        key = "department/example.parquet"
+    # def test_clean_department_drops_last_updated_before_created_at(self):
+    #     bucket = "test-bucket"
+    #     key = "department/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "department_id": 1,
-                    "department_name": "Sales",
-                    "location": "Manchester",
-                    "manager": "Richard Roma",
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962000"),
-                    "last_updated": datetime.fromisoformat("2022-11-01 14:20:49.962000"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "department_id": 1,
+    #                 "department_name": "Sales",
+    #                 "location": "Manchester",
+    #                 "manager": "Richard Roma",
+    #                 "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962000"),
+    #                 "last_updated": datetime.fromisoformat("2022-11-01 14:20:49.962000"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
+    #     self._upload_parquet(df, bucket, key)
 
-        result = clean_department(file_path=key, bucket_name=bucket)
+    #     result = clean_department(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty

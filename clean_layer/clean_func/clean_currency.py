@@ -12,8 +12,8 @@ def clean_currency(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
 
     df = df.drop_duplicates(subset=['currency_id'], keep='first')
 
-    now = pd.Timestamp.now()
-    df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
+    # now = pd.Timestamp.now()
+    # df = df[(df['created_at'] <= now) & (df['last_updated'] <= now) & (df['created_at'] <= df['last_updated'])]
 
     valid_currency_codes = ['USD', 'GBP', 'EUR']
 

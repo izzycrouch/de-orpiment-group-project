@@ -17,9 +17,9 @@ def clean_payment(bucket_name, file_path):
 
     df['payment_date'] = pd.to_datetime(df['payment_date'], format='%Y-%m-%d', errors='coerce')
 
-    today = datetime.today()
+    # today = datetime.today()
 
-    df = df[(df["created_at"] <= today) & (df["last_updated"] <= today) & (df["payment_date"] <= today)]
+    # df = df[(df["created_at"] <= today) & (df["last_updated"] <= today) & (df["payment_date"] <= today)]
 
     df = df.dropna(how='any',axis=0)
 

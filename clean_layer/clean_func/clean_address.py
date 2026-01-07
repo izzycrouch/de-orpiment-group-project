@@ -31,8 +31,8 @@ def clean_address(bucket_name, file_path):
                 for k in v.split()
             )
         )
-    today = pd.Timestamp.now()
-    df = df[(df["created_at"] <= today) & (df["last_updated"] <= today)]
+    # today = pd.Timestamp.now()
+    # df = df[(df["created_at"] <= today) & (df["last_updated"] <= today)]
 
     non_null = ['address_id', 'address_line_1', 'city', 'postal_code', 'country', 'phone', 'created_at', 'last_updated']
     df = df.dropna(subset=non_null)

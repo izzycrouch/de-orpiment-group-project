@@ -34,7 +34,7 @@ def clean_department(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     )
 
 
-    now = pd.Timestamp.now()
-    df = df[(df["created_at"] <= now) & (df["last_updated"] <= now)]
-    df = df[df["created_at"] <= df["last_updated"]]
+    # now = pd.Timestamp.now()
+    # df = df[(df["created_at"] <= now) & (df["last_updated"] <= now)]
+    # df = df[df["created_at"] <= df["last_updated"]]
     return df

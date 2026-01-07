@@ -115,3 +115,24 @@ resource "aws_iam_role_policy_attachment" "attach_cloud_watch_to_transform" {
 }
 
 
+
+resource "aws_iam_role" "iam_for_sfn" {
+  name               = "state_machine_role"
+  assume_role_policy = data.aws_iam_policy_document.state_machine_assume_role.json
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+data "aws_iam_policy_document" "state_machine_assume_role" {
+  statement {
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${resource.aws_lambda_function.extract_raw_data_function.function_name}}",
+      "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${resource.aws_lambda_function.transform_data_function.function_name}}"
+    ]
+  }
+}
+

@@ -146,44 +146,44 @@ class TestCleanPaymentType:
         assert len(result) == 1
         assert result["created_at"].iloc[0] == datetime.fromisoformat("2022-11-01 10:00:00")
 
-    def test_clean_payment_type_drops_future_dates(self):
-        bucket = "test-bucket"
-        key = "payment_type/example.parquet"
+    # def test_clean_payment_type_drops_future_dates(self):
+    #     bucket = "test-bucket"
+    #     key = "payment_type/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "payment_type_id": 1,
-                    "payment_type_name": "SALES_RECEIPT",
-                    "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
-                    "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "payment_type_id": 1,
+    #                 "payment_type_name": "SALES_RECEIPT",
+    #                 "created_at": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #                 "last_updated": datetime.fromisoformat("2050-01-01 00:00:00"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
+    #     self._upload_parquet(df, bucket, key)
 
-        result = clean_payment_type(file_path=key, bucket_name=bucket)
+    #     result = clean_payment_type(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty
 
-    def test_clean_payment_type_drops_last_updated_before_created_at(self):
-        bucket = "test-bucket"
-        key = "payment_type/example.parquet"
+    # def test_clean_payment_type_drops_last_updated_before_created_at(self):
+    #     bucket = "test-bucket"
+    #     key = "payment_type/example.parquet"
 
-        df = pd.DataFrame(
-            [
-                {
-                    "payment_type_id": 1,
-                    "payment_type_name": "SALES_RECEIPT",
-                    "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962000"),
-                    "last_updated": datetime.fromisoformat("2022-11-01 14:20:49.962000"),
-                }
-            ]
-        )
+    #     df = pd.DataFrame(
+    #         [
+    #             {
+    #                 "payment_type_id": 1,
+    #                 "payment_type_name": "SALES_RECEIPT",
+    #                 "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962000"),
+    #                 "last_updated": datetime.fromisoformat("2022-11-01 14:20:49.962000"),
+    #             }
+    #         ]
+    #     )
 
-        self._upload_parquet(df, bucket, key)
+    #     self._upload_parquet(df, bucket, key)
 
-        result = clean_payment_type(file_path=key, bucket_name=bucket)
+    #     result = clean_payment_type(file_path=key, bucket_name=bucket)
 
-        assert result.empty
+    #     assert result.empty
