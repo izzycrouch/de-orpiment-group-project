@@ -1,28 +1,28 @@
-# trigger for extract raw data lambda
-resource "aws_cloudwatch_event_rule" "scheduler" {
-  name                = "trigger-aws-lambda"
-  description         = "Trigger Lambda Function Every 5 Mins"
-  schedule_expression = "rate(5 minutes)"
-}
+# # trigger for extract raw data lambda
+# resource "aws_cloudwatch_event_rule" "scheduler" {
+#   name                = "trigger-aws-lambda"
+#   description         = "Trigger Lambda Function Every 5 Mins"
+#   schedule_expression = "rate(5 minutes)"
+# }
 
-resource "aws_cloudwatch_event_target" "lambda" {
-  rule      = aws_cloudwatch_event_rule.scheduler.name
-  target_id = "trigger-extract-raw-data-function"
-  arn       = aws_lambda_function.extract_raw_data_function.arn
-}
+# resource "aws_cloudwatch_event_target" "lambda" {
+#   rule      = aws_cloudwatch_event_rule.scheduler.name
+#   target_id = "trigger-extract-raw-data-function"
+#   arn       = aws_lambda_function.extract_raw_data_function.arn
+# }
 
-resource "aws_lambda_permission" "allow_event_bridge_extract" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.extract_raw_data_function.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.scheduler.arn
-}
+# resource "aws_lambda_permission" "allow_event_bridge_extract" {
+#   statement_id  = "AllowExecutionFromEventBridge"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.extract_raw_data_function.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.scheduler.arn
+# }
 
-resource "aws_s3_bucket_notification" "raw_data_bucket_notification" {
-  bucket      = "totesys-raw-data-aci"
-  eventbridge = true
-}
+# resource "aws_s3_bucket_notification" "raw_data_bucket_notification" {
+#   bucket      = "totesys-raw-data-aci"
+#   eventbridge = true
+# }
 
 
 # # trigger for transform data lambda
