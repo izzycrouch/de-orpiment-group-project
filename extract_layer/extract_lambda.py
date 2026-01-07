@@ -20,7 +20,7 @@ def lambda_handler(event, content):
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     db = None
     try:
-        content_list = {}
+        content_list = []
         logger.info("Start extract")
         ENV = os.getenv("ENV", "dev")
         if ENV == "dev":
@@ -34,7 +34,7 @@ def lambda_handler(event, content):
         old_json = get_latest_extraction_info(BUCKET_NAME)
         if not old_json:
             old_json = build_inital_json(tables)
-        new_json = []
+        new_json = {}
         for table in tables:
             logger.info(f"Start extract {table}")
             file_name = table +  prefix + 'batch_' + timestamp +'.parquet'
