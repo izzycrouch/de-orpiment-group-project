@@ -2,9 +2,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "my-state-machine"
   role_arn = aws_iam_role.iam_for_sfn.arn
 
-  definition = <<EOF
-
-  {
+  definition = {
     "Comment": "A description of my state machine",
     "StartAt": "invoke extract lambda",
     "States": {
@@ -59,5 +57,5 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     },
     "QueryLanguage": "JSONata"
   }
-EOF
+
 }
