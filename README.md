@@ -33,7 +33,7 @@ In this project, we have created applications that will extract, transform, and 
     - PG_HOST=localhost
     - PG_PORT=5432
     - ENV=dev
-4. Run `make pytest` and check all tests pass
+4. Run `make run-pytest` and check all tests pass
 5. Run `make run-script` to create s3 buckets and necessary layers
 6. Go into the terraform folder in your terminal and run `terraform init`
 7. Run `terraform plan`
