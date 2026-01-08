@@ -13,7 +13,6 @@ def clean_design(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     df['design_name'] = df['design_name'].astype('string').str.strip()
     df['file_location'] = df['file_location'].astype('string').str.strip()
     df['file_name'] = df['file_name'].astype('string').str.strip()
-    df = df.dropna()
 
     # drops duplicates of design_id
     df = df.drop_duplicates(subset=['design_id'], keep='first')
@@ -28,5 +27,9 @@ def clean_design(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     # drop rows where file_name doesnt end with correct suffix
     valid_suffix = ('.json', '.csv', '.parquet')
     df = df[(df['file_name'].str.endswith(valid_suffix))]
+
+    non_null = ['design_id', 'created_at', 'last_updated', 'design_name',
+            'file_location', 'file_name']
+    df = df.dropna(subset=non_null)
 
     return df

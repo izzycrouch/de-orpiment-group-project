@@ -21,8 +21,10 @@ def clean_counterparty(
     df["commercial_contact"] = df["commercial_contact"].astype("string")
     df["delivery_contact"] = df["delivery_contact"].astype("string")
 
+    non_null = ['counterparty_id', 'counterparty_legal_name', 'legal_address_id',
+                'created_at', 'last_updated']
+    df = df.dropna(subset=non_null)
 
-    df = df.dropna()
     df = df.drop_duplicates(subset=["counterparty_id"], keep="first")
 
     # now = pd.Timestamp.now()

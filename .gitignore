@@ -10,3 +10,5 @@ venv
 **python
 zip_lambda_func
 .coverage
+read_parquet.py
+reload_transcation.py

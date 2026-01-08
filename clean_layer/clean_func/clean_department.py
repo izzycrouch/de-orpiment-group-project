@@ -13,16 +13,8 @@ def clean_department(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     df["created_at"] = pd.to_datetime(df["created_at"], errors="coerce")
     df["last_updated"] = pd.to_datetime(df["last_updated"], errors="coerce")
 
-    df = df.dropna(
-        subset=[
-            "department_id",
-            "department_name",
-            "location",
-            "manager",
-            "created_at",
-            "last_updated",
-        ]
-    )
+    non_null = ['department_id', 'department_name', 'created_at', 'last_updated']
+    df = df.dropna(subset=non_null)
 
     for col in ["department_name", "location", "manager"]:
         df[col] = df[col].str.strip()

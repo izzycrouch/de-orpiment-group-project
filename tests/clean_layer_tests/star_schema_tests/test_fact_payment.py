@@ -1,6 +1,6 @@
 from clean_layer.star_schema_tables.fact_payment import create_fact_payment
 import pandas as pd
-from datetime import datetime 
+from datetime import datetime
 
 class TestFactPayment:
     def test_returns_dataframe(self):
@@ -68,7 +68,7 @@ class TestFactPayment:
                 "paid",
                 "payment_date"
             ]
-        
+
         assert (expected_cols == df.columns).any()
 
     def test_correct_data_types(self):
@@ -97,9 +97,9 @@ class TestFactPayment:
         print(df.dtypes)
         assert df["payment_record_id"].dtype == int
         assert df["payment_id"].dtype == int
-        assert df["created_date"].dtype == object
+        assert df["created_date"].dtype == 'datetime64[ns]'
         assert df["created_time"].dtype == object
-        assert df["last_updated_date"].dtype == object
+        assert df["last_updated_date"].dtype == 'datetime64[ns]'
         assert df["last_updated_time"].dtype == object
         assert df["transaction_id"].dtype == int
         assert df["counterparty_id"].dtype == int
@@ -107,4 +107,3 @@ class TestFactPayment:
         assert df["currency_id"].dtype == int
         assert df["payment_type_id"].dtype == int
         assert df["paid"].dtype == bool
-        assert df["payment_date"].dtype == 'datetime64[ns]'

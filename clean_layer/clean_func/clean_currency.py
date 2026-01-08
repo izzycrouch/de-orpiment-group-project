@@ -8,7 +8,8 @@ def clean_currency(file_path: str, bucket_name: str = 'totesys-raw-data-aci'):
     df['currency_code'] = df['currency_code'].astype('string').str.strip().str.upper()
     df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')
     df['last_updated'] = pd.to_datetime(df['last_updated'], errors='coerce')
-    df = df.dropna()
+    non_null = ['currency_id', 'currency_code', 'created_at', 'last_updated']
+    df = df.dropna(subset=non_null)
 
     df = df.drop_duplicates(subset=['currency_id'], keep='first')
 
