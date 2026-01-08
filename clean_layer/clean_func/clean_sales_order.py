@@ -17,7 +17,6 @@ def clean_sales_order(file_path: str, bucket_name: str = 'totesys-raw-data-aci')
     df['agreed_delivery_date'] = pd.to_datetime(df['agreed_delivery_date'], errors='coerce')
     df['agreed_payment_date'] = pd.to_datetime(df['agreed_payment_date'], errors='coerce')
     df['agreed_delivery_location_id'] = pd.to_numeric(df['agreed_delivery_location_id'], errors='coerce')
-    df = df.dropna()
 
     df = df.drop_duplicates(subset=['sales_order_id'], keep='first')
 
