@@ -21,7 +21,7 @@ def clean_staff(bucket_name, file_path):
     # now = pd.Timestamp.now()
     # df = df[(df["created_at"] <= now) & (df["last_updated"] <= now)]
 
-    df = df.dropna(how='any',axis=0)
+
 
     # pattern = r"^[a-zA-Z0-9._%+'-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     # df = df[df["email_address"].str.match(pattern)]
