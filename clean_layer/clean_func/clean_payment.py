@@ -21,6 +21,4 @@ def clean_payment(bucket_name, file_path):
 
     # df = df[(df["created_at"] <= today) & (df["last_updated"] <= today) & (df["payment_date"] <= today)]
 
-    df = df.dropna(how='any',axis=0)
-
     return df
