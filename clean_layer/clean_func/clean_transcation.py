@@ -10,7 +10,7 @@ def clean_transcation(file_path: str, bucket_name: str = 'totesys-raw-data-aci')
     df['purchase_order_id'] = pd.to_numeric(df['purchase_order_id'], errors='coerce')
     df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce')
     df['last_updated'] = pd.to_datetime(df['last_updated'], errors='coerce')
-    df = df.dropna()
+    # df = df.dropna()
 
     df = df.drop_duplicates(subset=['transaction_id'], keep='first')
 
