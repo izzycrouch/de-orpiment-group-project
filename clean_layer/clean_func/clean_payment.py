@@ -13,12 +13,10 @@ def clean_payment(bucket_name, file_path):
         .str.strip()
     )
     df['payment_amount'] = pd.to_numeric(df['payment_amount'], errors="coerce")
-
-
     df['payment_date'] = pd.to_datetime(df['payment_date'], format='%Y-%m-%d', errors='coerce')
 
-    # today = datetime.today()
-
-    # df = df[(df["created_at"] <= today) & (df["last_updated"] <= today) & (df["payment_date"] <= today)]
-
+    non_null = ['payment_id', 'created_at', 'last_updated', 'transaction_id',
+                'counterparty_id', 'payment_amount', 'currency_id', 'payment_type_id',
+                'paid', 'payment_date', 'company_ac_number', 'counterparty_ac_number']
+    df = df.dropna(subset=non_null)
     return df
