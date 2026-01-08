@@ -21,7 +21,6 @@ def clean_purchase_order(
     df["item_unit_price"] = pd.to_numeric(df["item_unit_price"], errors="coerce")
     df["item_code"] = df["item_code"].astype("string")
 
-    df = df.dropna()
     df = df.drop_duplicates(subset=["purchase_order_id"], keep="first")
     # now = pd.Timestamp.now()
 
