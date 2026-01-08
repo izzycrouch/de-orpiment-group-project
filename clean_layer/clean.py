@@ -94,25 +94,14 @@ def lambda_handler(event, context):
         save_data(dim_design_df,processed_bucket_name,key)
         logger.info("Finish design part")
 
-        try:
-            logger.info("Start location part")
-            logger.info("dataframe head - {}".format(cleaned_df_dict['address'].head()))
-            logger.info(f"{str(cleaned_df_dict['address'])}")
-            dim_location_df = dim_location.create_dim_location(cleaned_df_dict['address'])
-            key = 'dim_location.parquet'
-            save_data(dim_location_df,processed_bucket_name,key)
-        except Exception as e:
-            logger.error(f"Major error on location transform: %s", str(e))
-            # print("ERROR IN LAMBDA:", str(e))
-            raise
+        dim_location_df = dim_location.create_dim_location(cleaned_df_dict['address'])
+        key = 'dim_location.parquet'
+        save_data(dim_location_df,processed_bucket_name,key)
+
 
         dim_payment_type_df = dim_payment_type.create_dim_payment_type(cleaned_df_dict['payment_type'])
         key = 'dim_payment_type.parquet'
         save_data(dim_payment_type_df,processed_bucket_name,key)
-
-        logger.info("Start staff part")
-        logger.info(f"{str(cleaned_df_dict['staff'])}")
-        # logger.info("dataframe staff head - {}".format(cleaned_df_dict['staff'].head()))
 
         dim_staff_df = dim_staff.create_dim_staff(cleaned_df_dict['staff'],cleaned_df_dict['department'])
         key = 'dim_staff.parquet'
@@ -183,6 +172,7 @@ def lambda_handler(event, context):
 
             for prefix in tables:
                 start_string = prefix + '/year='
+                file_list = []
                 for key in event:
                     if key.startswith(start_string):
                         logger.info(f"Start clean {key}!")
@@ -190,15 +180,19 @@ def lambda_handler(event, context):
                         logger.info(f"Finish clean {key}!")
                         if prefix in list(dim_func_map.keys()):
                             update_dim(df,processed_bucket_name,dim_func_map[prefix][0],dim_func_map[prefix][1])
+                            file_list.append(dim_func_map[prefix][1])
 
                         elif prefix=='counterparty':
                             dim_counterparty.update_counterparty(df,processed_bucket_name)
+                            file_list.append('dim_counterparty.parquet')
 
                         elif prefix == 'staff':
                             dim_staff.update_dim_staff(df,processed_bucket_name)
+                            file_list.append('dim_staff.parquet')
 
                         elif prefix == 'department':
                             dim_staff.update_dim_staff(df,processed_bucket_name)
+                            file_list.append('dim_staff.parquet')
 
         #fact table
                         elif prefix == 'sales_order':
@@ -227,6 +221,7 @@ def lambda_handler(event, context):
                                         dim_location = dim_location_df )
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
+                            file_list.append(key)
 
                         elif prefix == 'purchase_order':
                             dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
@@ -248,6 +243,7 @@ def lambda_handler(event, context):
 
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
+                            file_list.append(key)
 
                         elif prefix == 'payment':
                             dim_counterparty_df =  get_df(processed_bucket_name,'dim_counterparty.parquet')
@@ -263,7 +259,10 @@ def lambda_handler(event, context):
                             df = fact_payment.create_fact_payment(payment = df, dim_payment_type = dim_payment_type_df, dim_transaction = dim_transaction_df, dim_counterparty = dim_counterparty_df , dim_currency = dim_currency_df , dim_date = dim_date_df)
                             new_df = pd.concat([dim_df,df],axis=0, ignore_index=True)
                             save_data(new_df,processed_bucket_name,key)
+                            file_list.append(key)
+
                         logger.info(f"Finish update {key}!")
+                        return file_list
         except Exception as e:
             logger.error(f"MAJOR_ERROR:%s", str(e))
             raise

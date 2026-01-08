@@ -35,7 +35,10 @@ def lambda_handler(event, content):
         for file in FILE_LIST:
             table_name = file.removesuffix(".parquet")
             df = get_df(BUCKET_NAME,file)
-            df.to_sql(name = table_name,con = db,if_exists = 'append')
+
+            df.to_sql(name = table_name,con = db,if_exists = 'append',index=False,method='multi',chunksize=1000)
+
+
             logger.info("finish create table")
 
     except Exception as e:
