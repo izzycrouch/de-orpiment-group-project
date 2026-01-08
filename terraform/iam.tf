@@ -77,10 +77,6 @@ resource "aws_iam_role" "extract_role" {
 }
 
 #attatch extract role
-resource "aws_iam_role_policy_attachment" "attach_secrets_to_extract" {
-  role       = aws_iam_role.extract_role.name
-  policy_arn = aws_iam_policy.secrets_read_policy.arn
-}
 
 resource "aws_iam_role_policy_attachment" "attach_read_to_extract" {
   role       = aws_iam_role.extract_role.name
@@ -90,6 +86,11 @@ resource "aws_iam_role_policy_attachment" "attach_read_to_extract" {
 resource "aws_iam_role_policy_attachment" "attach_cloud_watch_to_extract" {
   role       = aws_iam_role.extract_role.name
   policy_arn = aws_iam_policy.cloud_watch_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_secrets_to_extract" {
+  role       = aws_iam_role.extract_role.name
+  policy_arn = aws_iam_policy.secrets_read_policy.arn
 }
 
 # make transform role
@@ -115,24 +116,118 @@ resource "aws_iam_role_policy_attachment" "attach_cloud_watch_to_transform" {
 }
 
 
-
-resource "aws_iam_role" "iam_for_sfn" {
-  name               = "state_machine_role"
-  assume_role_policy = data.aws_iam_policy_document.state_machine_assume_role.json
+#make load role
+resource "aws_iam_role" "load_role" {
+  name               = "load_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
   tags = {
     tag-key = "tag-value"
   }
 }
 
-data "aws_iam_policy_document" "state_machine_assume_role" {
+#attatch load role
+
+resource "aws_iam_role_policy_attachment" "attach_read_to_load" {
+  role       = aws_iam_role.load_role.name
+  policy_arn = aws_iam_policy.s3_write_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_cloud_watch_to_load" {
+  role       = aws_iam_role.load_role.name
+  policy_arn = aws_iam_policy.cloud_watch_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_secrets_to_load" {
+  role       = aws_iam_role.load_role.name
+  policy_arn = aws_iam_policy.secrets_read_policy.arn
+}
+
+
+
+
+
+# creat eventbridge role
+data "aws_iam_policy_document" "event_assume_role" {
   statement {
-    actions = [
-      "lambda:InvokeFunction"
-    ]
-    resources = [
-      "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${resource.aws_lambda_function.extract_raw_data_function.function_name}}",
-      "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${resource.aws_lambda_function.transform_data_function.function_name}}"
-    ]
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
   }
 }
+
+
+resource "aws_iam_role" "iam_for_eventbridge" {
+  name               = "eventbridge_role"
+  assume_role_policy = data.aws_iam_policy_document.event_assume_role.json
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+data "aws_iam_policy_document" "execute_policy_doc" {
+  statement {
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
+    resources = ["*"]
+  }
+}
+
+
+resource "aws_iam_policy" "eventbridge_policy" {
+  name   = "eventbridge_policy"
+  policy = data.aws_iam_policy_document.execute_policy_doc.json
+
+}
+
+
+resource "aws_iam_role_policy_attachment" "attach_eventbridge_policy" {
+  role       = aws_iam_role.iam_for_eventbridge.name
+  policy_arn = aws_iam_policy.eventbridge_policy.arn
+}
+
+#creat step function role
+data "aws_iam_policy_document" "sfn_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+  }
+}
+
+
+resource "aws_iam_role" "iam_for_sfn" {
+  name               = "sfn_role"
+  assume_role_policy = data.aws_iam_policy_document.sfn_role.json
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+data "aws_iam_policy_document" "invoke_policy_doc" {
+  statement {
+    effect    = "Allow"
+    actions   = ["lambda:InvokeFunction"]
+    resources = ["*"]
+  }
+}
+
+
+resource "aws_iam_policy" "sfn_policy" {
+  name   = "sfn_policy"
+  policy = data.aws_iam_policy_document.invoke_policy_doc.json
+}
+
+
+resource "aws_iam_role_policy_attachment" "attach_sfn_policy" {
+  role       = aws_iam_role.iam_for_sfn.name
+  policy_arn = aws_iam_policy.sfn_policy.arn
+}
+
+
+
+
 
