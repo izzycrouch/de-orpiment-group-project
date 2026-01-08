@@ -52,7 +52,8 @@ resource "aws_lambda_function" "transform_data_function" {
     }
   }
 
-  timeout = 900
+  timeout     = 900
+  memory_size = 1024
 }
 
 
@@ -78,5 +79,6 @@ resource "aws_lambda_function" "load_function" {
     }
   }
 
-  timeout = 900
+  timeout     = 900
+  memory_size = 1024
 }
